@@ -1,0 +1,1 @@
+add_library(compleks_world world.cxx camera.cxx object.cxx)

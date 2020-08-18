@@ -1,0 +1,53 @@
+#include "shader.hxx"
+
+#include <memory>
+#include <stdexcept>
+#include <iostream>
+#include <string>
+
+#include "../utils/logger.hxx"
+
+using namespace std::literals;
+
+namespace compleks
+{
+
+shader::shader(type t)
+{
+    id = glCreateShader(t == VERTEX ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
+}
+
+bool shader::compile(std::unique_ptr<resource> source)
+{
+    if (source) {
+        src = std::move(source);
+    } else if (src) {
+        src->reload();
+    } else {
+        logger::warn("Could not compile shader: no source provided");
+
+        return false;
+    }
+
+    glShaderSource(id, 1, (char **)&src->ptr, (int *)&src->size);
+    glCompileShader(id);
+    
+    int status, length;
+    glGetShaderiv(id, GL_COMPILE_STATUS, &status);
+    if (!status) {
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+        auto log = std::make_unique<char[]>(length);
+        glGetShaderInfoLog(id, length, NULL, log.get());
+
+        logger::error("Shader compile error:\n"s + log.get());
+    }
+
+    return status;
+}
+
+shader::~shader()
+{
+    glDeleteShader(id);
+}
+
+} // namespace compleks

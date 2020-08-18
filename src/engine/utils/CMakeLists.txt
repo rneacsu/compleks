@@ -1,0 +1,1 @@
+add_library(compleks_utils resource.cxx logger.cxx)

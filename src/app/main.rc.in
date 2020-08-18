@@ -1,0 +1,2 @@
+APP_ICON        ICON   "${CMAKE_SOURCE_DIR}/res/app.ico"
+APP_WINDOW_ICON IMAGE  "${CMAKE_SOURCE_DIR}/res/app.png"

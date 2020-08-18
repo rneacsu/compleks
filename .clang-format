@@ -1,0 +1,7 @@
+---
+BasedOnStyle: WebKit
+NamespaceIndentation: None
+ColumnLimit: 80
+AllowShortBlocksOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: None
+PointerAlignment: Right
