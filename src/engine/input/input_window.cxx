@@ -3,13 +3,10 @@
 #include <iostream>
 #include <string>
 
-namespace compleks
-{
+namespace compleks {
 
-std::map<
-    GLFWwindow *,
-    std::pair<input_window *, std::list<input_listener *>>
-> input_window::listeners;
+std::map<GLFWwindow *, std::pair<input_window *, std::list<input_listener *>>>
+    input_window::listeners;
 
 input_window::input_window()
 {
@@ -18,6 +15,7 @@ input_window::input_window()
     glfwSetMouseButtonCallback(ctx, mouse_button_callback);
     glfwSetCursorEnterCallback(ctx, mouse_enter_callback);
     glfwSetScrollCallback(ctx, mouse_scroll_callback);
+    glfwSetFramebufferSizeCallback(ctx, window_resize_callback);
 
     add_listener(this);
 }
@@ -55,13 +53,13 @@ void input_window::mouse_move_callback(GLFWwindow *ctx, double x, double y)
 
     float dx = (float)(x - window->old_x);
     float dy = (float)(y - window->old_y);
-    
-    for (auto &listener : window_listeners) {
-        listener->mouse_move(dx , dy);
-    }
 
     window->old_x = x;
     window->old_y = y;
+
+    for (auto &listener : window_listeners) {
+        listener->mouse_move(dx, dy);
+    }
 }
 
 void input_window::mouse_button_callback(
@@ -83,7 +81,7 @@ void input_window::mouse_enter_callback(GLFWwindow *ctx, int enter)
     auto &window_listeners = instance.second;
 
     glfwGetCursorPos(ctx, &window->old_x, &window->old_y);
-    
+
     for (auto &listener : window_listeners) {
         if (enter) {
             listener->mouse_enter();
@@ -100,6 +98,14 @@ void input_window::mouse_scroll_callback(GLFWwindow *ctx, double, double dy)
     }
 }
 
+void input_window::window_resize_callback(
+    GLFWwindow *ctx, int width, int height)
+{
+    for (auto &listener : listeners[ctx].second) {
+        listener->window_resize(width, height);
+    }
+}
+
 void input_window::set_cursor(bool enabled)
 {
     if (enabled) {
@@ -109,72 +115,6 @@ void input_window::set_cursor(bool enabled)
     }
     cursor_enabled = enabled;
     glfwGetCursorPos(ctx, &old_x, &old_y);
-}
-
-void input_window::key_down(int key, int mods)
-{
-    key, mods;
-    // log_key(true, key, mods);
-}
-
-void input_window::key_up(int key, int mods)
-{
-    key, mods;
-    // log_key(false, key, mods);
-}
-
-void input_window::mouse_down(int button)
-{
-    button;
-    // std::cout << "Mouse down: " << button << "\n";
-}
-
-void input_window::mouse_up(int button)
-{
-    button;
-    // std::cout << "Mouse up:   " << button << "\n";
-}
-
-void input_window::mouse_move(float dx, float dy)
-{
-    dx, dy;
-    // std::cout << "Mouse move: " << dx << " " << dy << "\n";
-}
-
-void input_window::mouse_enter()
-{
-    // std::cout << "enter\n";
-}
-
-void input_window::mouse_leave()
-{
-    // std::cout << "leave\n"; 
-}
-
-void input_window::mouse_scroll(float delta)
-{
-    std::cout << "Scroll: " << delta << "\n";
-}
-
-void input_window::log_key(bool down, int key, int mods)
-{
-    std::cout << "Key " << (down ? "down: " : "up:   ");
-    std::cout << (unsigned char)key << " (" << key << ")";
-    
-    std::cout << "\t";
-
-    std::string mod_list;
-    if (mods & GLFW_MOD_CONTROL) {
-        mod_list += " CTRL";
-    }
-    if (mods & GLFW_MOD_ALT) {
-        mod_list += " ALT";
-    }
-    if (mods & GLFW_MOD_SHIFT) {
-        mod_list += " SHIFT";
-    }
-
-    std::cout << "mods: " << mod_list << "\n";
 }
 
 }

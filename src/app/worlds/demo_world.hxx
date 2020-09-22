@@ -6,10 +6,11 @@
 class demo_world : public compleks::world {
 public:
     demo_world();
+
 private:
     compleks::lighting::light sun;
-    compleks::object plane;
-    compleks::object cube;
+    std::shared_ptr<compleks::object> plane, cube;
+    std::shared_ptr<compleks::portal> p1, p2;
 };
 
 #endif // __DEMO_WORLD_HXX

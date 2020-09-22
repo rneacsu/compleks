@@ -14,4 +14,7 @@ set(CMAKE_CXX_FLAGS
     /std:c++17"
 )
 
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS True)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 add_subdirectory(src)

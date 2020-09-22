@@ -29,10 +29,10 @@ protected:
     GLFWwindow *ctx;
     double old_time = 0;
     bool fullscreen = false;
-    int width, height, x, y;
+    engine en;
 
 private:
-    static engine e;
+    int width, height, x, y;
 };
 
 }

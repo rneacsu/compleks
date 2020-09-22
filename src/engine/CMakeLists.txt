@@ -7,7 +7,7 @@ add_subdirectory(image)
 add_subdirectory(render)
 add_subdirectory(world)
 
-add_library(compleks)
+add_library(compleks SHARED)
 target_link_libraries(compleks
     compleks_core 
     compleks_utils

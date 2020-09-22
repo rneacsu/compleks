@@ -1,1 +1,1 @@
-add_library(compleks_utils resource.cxx logger.cxx)
+add_library(compleks_utils OBJECT resource.cxx logger.cxx)

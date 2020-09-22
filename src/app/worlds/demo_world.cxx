@@ -1,7 +1,5 @@
 #include "demo_world.hxx"
 
-#include <glm/gtc/constants.hpp>
-
 demo_world::demo_world()
 {
     sun.ambient = glm::vec3(1.0f, 1.0f, 1.0f) * 0.25f;
@@ -12,26 +10,35 @@ demo_world::demo_world()
     sun.attenuation = glm::vec3(1, 0, 0);
     sun.cut_off = glm::radians(10.0f);
     sun.direction = glm::normalize(-sun.pos);
+    lighting.add_light(&sun);
 
     glClearColor(135 / 255.0f, 206 / 255.0f, 235 / 255.0f, 1.0f);
 
-    lighting.add_light(&sun);
+    load_mesh("cube", "res/cube.dae");
+    cube = std::make_shared<compleks::object>("cube");
+    plane = std::make_shared<compleks::object>("quad");
 
-    compleks::mesh_library::add("cube", "res/cube.dae");
-    compleks::mesh_library::add("square", "res/plane.obj");
+    cube->pos = { 0, 0.5, 0 };
+    plane->pos = { 0, 0, 0 };
+    plane->scale = { 50, 50, 1 };
+    plane->quat = glm::quat({ glm::radians(-90.0f), 0.0f, 0.0f });
 
-    cube = compleks::object("cube");
-    plane = compleks::object("square");
+    objects.push_back(cube);
+    objects.push_back(plane);
 
-    cube.pos = { 0, 0.5, 0 };
-    plane.scale = { 50, 50, 1 };
-    plane.pitch = -glm::half_pi<float>();
-    plane.pos = { 0, 0, 0 };
+    p1 = std::make_shared<compleks::portal>();
+    p2 = std::make_shared<compleks::portal>();
 
-    objects.push_back(&cube);
-    objects.push_back(&plane);
+    p1->pos = { 0, 0.5, -2 };
+    p1->scale = { 2, 4, 1 };
+    // p1.quat = glm::quat({ 0.0f, glm::radians(-90.0f), 0.0f });
 
-    camera.set_position({ 1, 1, 1 });
-    camera.set_orientation(
-        -3 * glm::quarter_pi<float>(), -glm::quarter_pi<float>() * 0.75f, 0);
+    p2->pos = { 0, 0.5, 2 };
+    p2->scale = { 2, 4, 1 };
+    p2->quat = glm::quat({ 0.0f, glm::radians(180.0f), 0.0f });
+
+    p1->set_target(p2);
+    p2->set_target(p1);
+    portals.push_back(p1);
+    portals.push_back(p2);
 }

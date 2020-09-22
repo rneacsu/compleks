@@ -4,8 +4,6 @@
 
 namespace compleks {
 
-engine window::e;
-
 window::window()
 {
     glfwWindowHint(GLFW_SAMPLES, 4);
@@ -23,7 +21,7 @@ window::window()
         throw std::runtime_error((char *)glewGetErrorString(err));
     }
 
-    e.enable_logs();
+    en.enable_gl_logs();
 
     const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
     glfwSetWindowPos(ctx, (mode->width - DEFAULT_WIDTH) / 2,

@@ -14,9 +14,9 @@
 
 namespace compleks {
 
-mesh::mesh(char const *path)
+mesh::mesh(std::string path)
 {
-    logger::info("Importing mesh " + std::string(path));
+    logger::info("Importing mesh " + path);
 
     Assimp::Importer importer;
     aiScene const *scene = importer.ReadFile(path,
@@ -114,6 +114,11 @@ mesh::mesh(char const *path)
         materials.push_back(std::move(mat));
     }
 
+    create_buffers();
+}
+
+void mesh::create_buffers()
+{
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
@@ -172,5 +177,4 @@ void mesh::render(program &prog)
     }
     glBindVertexArray(0);
 }
-
 }

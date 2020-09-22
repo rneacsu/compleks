@@ -11,13 +11,7 @@
 namespace compleks {
 
 class mesh {
-public:
-    mesh(char const *path);
-    ~mesh();
 
-    void render(program &);
-
-private:
     struct material {
         std::unique_ptr<texture> diffuse, specular, ambient, emissive;
         float shininess;
@@ -29,12 +23,21 @@ private:
         unsigned int start_index;
     };
 
+public:
+    mesh(std::string path);
+    ~mesh();
+
+    void render(program &);
+
+private:
     GLuint vao, vertices_buf, normals_buf, tex_coords_buf, indices_buf;
     std::vector<glm::vec3> vertices, normals;
     std::vector<glm::vec2> tex_coords;
     std::vector<unsigned int> indices;
     std::vector<material> materials;
     std::vector<object> objects;
+
+    void create_buffers();
 };
 
 } // namespace compleks

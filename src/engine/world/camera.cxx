@@ -1,5 +1,6 @@
 #include "camera.hxx"
 
+#include <iostream>
 #include <string>
 
 #include <GLFW/glfw3.h>
@@ -18,6 +19,10 @@ camera::camera()
 
 void camera::update(double delta)
 {
+    if (!enabled) {
+        return;
+    }
+
     float multiplier = sprint ? 3.0f : 1.5f;
 
     delta *= multiplier;
@@ -60,6 +65,11 @@ void camera::set_orientation(float y, float p, float r)
     pitch = p;
     roll = r;
     mouse_move(0.0f, 0.0f);
+}
+
+void camera::set_enabled(bool en)
+{
+    enabled = en;
 }
 
 void camera::key_down(int key, int)
@@ -132,6 +142,10 @@ void camera::key_up(int key, int)
 
 void camera::mouse_move(float dx, float dy)
 {
+    if ((dx || dy) && !enabled) {
+        return;
+    }
+
     yaw += (dx * cos(roll) + dy * sin(roll)) * 0.005f;
     pitch += (dx * sin(roll) - dy * cos(roll)) * 0.005f;
     pitch
@@ -146,15 +160,20 @@ void camera::mouse_move(float dx, float dy)
 
 void camera::mouse_scroll(float delta)
 {
+    if (!enabled) {
+        return;
+    }
+
     fov += -delta * 0.05f;
 }
 
 void camera::reset()
 {
-    pos = { 0, 0, 1 };
+    pos = { 1.5, 2, 1.5 };
     up = { 0, 1, 0 };
-    pitch = roll = 0;
-    yaw = -glm::half_pi<float>();
+    yaw = glm::radians(-135.0f);
+    pitch = glm::radians(-30.0f);
+    roll = 0;
     fov = glm::radians(60.0f);
     walk_front = walk_right = elevate = tilt = 0;
     sprint = false;

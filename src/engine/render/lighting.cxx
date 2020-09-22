@@ -19,7 +19,7 @@ lighting::~lighting()
 {
 }
 
-void lighting::add_light(light* l)
+void lighting::add_light(light *l)
 {
     if (lights.size() == MAX_LIGHTS) {
         logger::warn(
@@ -30,15 +30,14 @@ void lighting::add_light(light* l)
     lights.push_back(l);
 }
 
-void lighting::remove_light(light* l)
+void lighting::remove_light(light *l)
 {
     lights.erase(std::remove(lights.begin(), lights.end(), l), lights.end());
 }
 
-void lighting::update(program& p, glm::vec3 eye)
+void lighting::update(program &p, glm::vec3 eye)
 {
     p.set("eye", eye);
-
     p.set("light_noise", noise_texture);
 
     for (unsigned int i = 0; i < lights.size(); i++) {

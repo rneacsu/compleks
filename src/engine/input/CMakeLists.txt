@@ -1,1 +1,1 @@
-add_library(compleks_input input_window.cxx)
+add_library(compleks_input OBJECT input_window.cxx)

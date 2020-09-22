@@ -1,1 +1,2 @@
-add_library(compleks_world world.cxx camera.cxx object.cxx)
+add_library(compleks_world OBJECT
+    world.cxx camera.cxx object.cxx portal.cxx)

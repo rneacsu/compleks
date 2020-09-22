@@ -1,9 +1,8 @@
 #ifndef __COMPLEKS_INPUT_INPUT_LISTENER_HXX
 #define __COMPLEKS_INPUT_INPUT_LISTENER_HXX
 
-namespace compleks
-{
-    
+namespace compleks {
+
 class input_listener {
 public:
     virtual void key_down(int, int) {};
@@ -14,6 +13,7 @@ public:
     virtual void mouse_enter() {};
     virtual void mouse_leave() {};
     virtual void mouse_scroll(float) {};
+    virtual void window_resize(int, int) {};
 };
 
 }

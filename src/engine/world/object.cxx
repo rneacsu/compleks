@@ -1,42 +1,54 @@
 #include "object.hxx"
 
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/euler_angles.hpp>
 
-#include "../render/mesh_library.hxx"
+namespace compleks {
 
-namespace compleks
+object::object(std::string mesh_id)
+    : mesh_id(mesh_id)
 {
-    
-object::object(std::string mesh_id) : mesh_id(mesh_id)
-{
-    pos = {0, 0, 0};
-    scale = {1, 1, 1};
-    yaw = pitch = roll = 0;
+    pos = { 0, 0, 0 };
+    scale = { 1, 1, 1 };
+    quat = glm::quat();
 }
 
-void object::render(program &prog, double delta, glm::mat4 transform)
+glm::mat4 object::get_model_matrix(void)
 {
-    update(delta);
+    return glm::scale(get_view_matrix(), scale);
+}
 
-    transform = glm::translate(transform, pos);
-    transform *= glm::yawPitchRoll(yaw, pitch, roll);
-    transform = glm::scale(transform, scale);
+glm::mat4 object::get_view_matrix(void)
+{
+    return glm::translate(glm::mat4(1), pos) * glm::mat4_cast(quat);
+}
+
+void object::render(engine &en, program &prog, glm::mat4 transform)
+{
+    transform *= get_model_matrix();
 
     prog.set("model_matrix", transform);
 
     if (!mesh_id.empty()) {
-        mesh_library::get(mesh_id).render(prog);
+        en.mesh_library.get(mesh_id).render(prog);
     }
 
     for (auto &child : children) {
-        child.render(prog, delta, transform);
+        child.render(en, prog, transform);
     }
 }
 
 void object::update(double)
 {
+}
 
+void object::update_all(double delta)
+{
+    // Update self
+    update(delta);
+    // Update children
+    for (auto &child : children) {
+        child.update_all(delta);
+    }
 }
 
 } // namespace compleks

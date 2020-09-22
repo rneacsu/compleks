@@ -5,8 +5,7 @@
 
 #include "../input/input_listener.hxx"
 
-namespace compleks
-{
+namespace compleks {
 
 class camera : public input_listener {
 public:
@@ -19,6 +18,7 @@ public:
     glm::vec3 get_position();
     void set_position(glm::vec3 pos);
     void set_orientation(float yaw, float pitch, float roll);
+    void set_enabled(bool);
     void reset();
 
     void key_down(int key, int mods) override;
@@ -31,8 +31,9 @@ private:
     glm::vec3 pos, front, up, right;
     char walk_front, walk_right, elevate, tilt;
     bool sprint = false;
+    bool enabled = false;
 };
-    
+
 } // namespace compleks
 
 #endif // __COMPLEKS_WORLD_CAMERA_HXX
