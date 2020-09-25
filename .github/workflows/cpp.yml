@@ -32,3 +32,21 @@ jobs:
       with:
         useVcpkgToolchainFile: true
         cmakeAppendedArgs: '-G NMake Makefiles'
+        cmakeBuildType: Release
+        buildDirectory: build 
+        
+    - name: Create packages
+      run: cpack
+      working-directory: build
+      
+    - name: Upload ZIP
+      uses: actions/upload-artifact@v2.1.4
+      with:
+        name: zip
+        path: build/*.zip
+
+    - name: Upload NSIS
+      uses: actions/upload-artifact@v2.1.4
+      with:
+        name: windows
+        path: build/*.exe
