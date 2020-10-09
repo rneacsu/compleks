@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 cmake_policy(SET CMP0091 NEW)
 
-set(VCPKG_TARGET_TRIPLET "x64-windows-static")
+set(VCPKG_TARGET_TRIPLET x64-windows-static CACHE STRING "Vcpkg target triplet")
 
 project(compleks VERSION 1.0.0)
 
