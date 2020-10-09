@@ -12,8 +12,8 @@ public:
     std::unique_ptr<char[]> uptr;
     size_t size;
 
-    resource(char const *name, char const *type);
-    resource(char const *path);
+    resource(std::string name, std::string type);
+    resource(std::string path);
     resource();
     ~resource();
 

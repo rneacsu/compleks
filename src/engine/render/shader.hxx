@@ -7,15 +7,11 @@
 
 #include "../utils/resource.hxx"
 
-namespace compleks
-{
+namespace compleks {
 
 class shader {
 public:
-    enum type {
-        VERTEX,
-        FRAGMENT
-    };
+    enum type { VERTEX, FRAGMENT };
 
     GLuint id;
 
@@ -29,6 +25,5 @@ private:
 };
 
 } // namespace compleks
-
 
 #endif // __COMPLEKS_RENDER_SHADER_HXX

@@ -17,8 +17,8 @@ class mesh {
         float shininess;
     };
 
-    struct object {
-        unsigned int material_idx;
+    struct shape {
+        int material_idx;
         unsigned int num_indices;
         unsigned int start_index;
     };
@@ -35,9 +35,12 @@ private:
     std::vector<glm::vec2> tex_coords;
     std::vector<unsigned int> indices;
     std::vector<material> materials;
-    std::vector<object> objects;
+    std::vector<shape> shapes;
 
-    void create_buffers();
+    material default_material;
+
+    void create_buffers(void);
+    void create_default_material(void);
 };
 
 } // namespace compleks

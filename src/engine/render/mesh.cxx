@@ -6,9 +6,8 @@
 #include <utility>
 #include <vector>
 
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
-#include <assimp/scene.h>
+#include <glm/gtc/type_ptr.hpp>
+#include <tiny_obj_loader.h>
 
 #include "../utils/logger.hxx"
 
@@ -18,103 +17,97 @@ mesh::mesh(std::string path)
 {
     logger::info("Importing mesh " + path);
 
-    Assimp::Importer importer;
-    aiScene const *scene = importer.ReadFile(path,
-        aiProcess_Triangulate | aiProcess_JoinIdenticalVertices
-            | aiProcess_GenSmoothNormals);
+    tinyobj::ObjReader reader;
+    bool ret = reader.ParseFromFile(path);
 
-    if (!scene) {
-        throw std::runtime_error(importer.GetErrorString());
+    std::string warn = reader.Warning();
+    std::string err = reader.Error();
+
+    if (!warn.empty()) {
+        logger::warn(warn);
+    }
+    if (!err.empty()) {
+        logger::error(err);
+    }
+    if (!ret) {
+        throw std::runtime_error("Could not import mesh " + path);
     }
 
-    unsigned int num_indices = 0, num_vertices = 0;
-    for (unsigned int i = 0; i < scene->mNumMeshes; i++) {
-        aiMesh *m = scene->mMeshes[i];
-        object o;
-        aiVector3D zero_vect(0, 0, 0);
+    tinyobj::attrib_t attr = reader.GetAttrib();
+    unsigned int num_vertices = 0;
+    bool create_def_mat = false;
+    for (auto &shape : reader.GetShapes()) {
+        struct shape s;
 
-        o.material_idx = m->mMaterialIndex;
-        o.num_indices = m->mNumFaces * 3;
-        o.start_index = num_indices;
-        objects.push_back(o);
-
-        for (unsigned int j = 0; j < m->mNumVertices; j++) {
-            aiVector3D &v = m->mVertices[j];
-            aiVector3D &n = m->mNormals[j];
-            aiVector3D &t
-                = m->HasTextureCoords(0) ? m->mTextureCoords[0][j] : zero_vect;
-
-            vertices.push_back({ v.x, v.y, v.z });
-            normals.push_back({ n.x, n.y, n.z });
-            tex_coords.push_back({ t.x, t.y });
+        s.material_idx = shape.mesh.material_ids[0];
+        if (s.material_idx < 0) {
+            create_def_mat = true;
         }
+        s.start_index = num_vertices;
 
-        for (unsigned int j = 0; j < m->mNumFaces; j++) {
-            aiFace &f = m->mFaces[j];
-
-            indices.push_back(num_vertices + f.mIndices[0]);
-            indices.push_back(num_vertices + f.mIndices[1]);
-            indices.push_back(num_vertices + f.mIndices[2]);
+        for (auto idx : shape.mesh.indices) {
+            vertices.push_back({ attr.vertices[3 * idx.vertex_index + 0],
+                attr.vertices[3 * idx.vertex_index + 1],
+                attr.vertices[3 * idx.vertex_index + 2] });
+            normals.push_back({ attr.normals[3 * idx.normal_index + 0],
+                attr.normals[3 * idx.normal_index + 1],
+                attr.normals[3 * idx.normal_index + 2] });
+            tex_coords.push_back({ attr.texcoords[2 * idx.texcoord_index + 0],
+                attr.texcoords[2 * idx.texcoord_index + 1] });
+            indices.push_back(num_vertices++);
         }
-
-        num_vertices += m->mNumVertices;
-        num_indices += o.num_indices;
+        s.num_indices = num_vertices - s.start_index;
+        shapes.push_back(s);
     }
 
     std::string dir = std::filesystem::path(path).parent_path().string() + "/";
 
-    for (unsigned int i = 0; i < scene->mNumMaterials; i++) {
-        aiMaterial *m = scene->mMaterials[i];
+    for (auto &m : reader.GetMaterials()) {
         material mat;
-        aiColor3D color;
-        aiString str;
 
-        if (m->GetTextureCount(aiTextureType_DIFFUSE) > 0
-            && m->GetTexture(aiTextureType_DIFFUSE, 0, &str) == AI_SUCCESS) {
+        if (!m.diffuse_texname.empty()) {
             mat.diffuse = std::make_unique<texture>(
-                image(resource((dir + str.C_Str()).c_str())));
-        } else if (m->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) {
-            mat.diffuse = std::make_unique<texture>(
-                glm::vec4(color.r, color.g, color.b, 1.0));
+                image(resource(dir + m.diffuse_texname)));
+        } else {
+            mat.diffuse = std::make_unique<texture>(glm::make_vec3(m.diffuse));
         }
 
-        if (m->GetTextureCount(aiTextureType_SPECULAR) > 0
-            && m->GetTexture(aiTextureType_SPECULAR, 0, &str) == AI_SUCCESS) {
+        if (!m.specular_texname.empty()) {
             mat.specular = std::make_unique<texture>(
-                image(resource((dir + str.C_Str()).c_str())));
-        } else if (m->Get(AI_MATKEY_COLOR_SPECULAR, color) == AI_SUCCESS) {
-            mat.specular = std::make_unique<texture>(
-                glm::vec4(color.r, color.g, color.b, 1.0));
+                image(resource(dir + m.specular_texname)));
+        } else {
+            mat.specular
+                = std::make_unique<texture>(glm::make_vec3(m.specular));
         }
 
-        if (m->GetTextureCount(aiTextureType_AMBIENT) > 0
-            && m->GetTexture(aiTextureType_AMBIENT, 0, &str) == AI_SUCCESS) {
+        if (!m.ambient_texname.empty()) {
             mat.ambient = std::make_unique<texture>(
-                image(resource((dir + str.C_Str()).c_str())));
-        } else if (m->GetTextureCount(aiTextureType_DIFFUSE) > 0
-            && m->GetTexture(aiTextureType_DIFFUSE, 0, &str) == AI_SUCCESS) {
+                image(resource(dir + m.ambient_texname)));
+        } else if (!m.diffuse_texname.empty()) {
             mat.ambient = std::make_unique<texture>(
-                image(resource((dir + str.C_Str()).c_str())));
-        } else if (m->Get(AI_MATKEY_COLOR_AMBIENT, color) == AI_SUCCESS) {
-            mat.ambient = std::make_unique<texture>(
-                glm::vec4(color.r, color.g, color.b, 1.0));
+                image(resource(dir + m.diffuse_texname)));
+        } else {
+            mat.ambient = std::make_unique<texture>(glm::make_vec3(m.ambient));
         }
 
-        if (m->GetTextureCount(aiTextureType_EMISSIVE) > 0
-            && m->GetTexture(aiTextureType_EMISSIVE, 0, &str) == AI_SUCCESS) {
+        if (!m.emissive_texname.empty()) {
             mat.emissive = std::make_unique<texture>(
-                image(resource((dir + str.C_Str()).c_str())));
-        } else if (m->Get(AI_MATKEY_COLOR_EMISSIVE, color) == AI_SUCCESS) {
-            mat.emissive = std::make_unique<texture>(
-                glm::vec4(color.r, color.g, color.b, 1.0));
+                image(resource(dir + m.emissive_texname)));
+        } else {
+            mat.emissive
+                = std::make_unique<texture>(glm::make_vec3(m.emission));
         }
 
-        m->Get(AI_MATKEY_SHININESS, mat.shininess);
+        mat.shininess = m.shininess;
 
         materials.push_back(std::move(mat));
     }
 
     create_buffers();
+
+    if (create_def_mat) {
+        create_default_material();
+    }
 }
 
 void mesh::create_buffers()
@@ -151,6 +144,16 @@ void mesh::create_buffers()
     glBindVertexArray(0);
 }
 
+void mesh::create_default_material(void)
+{
+    default_material.diffuse
+        = std::make_unique<texture>(glm::vec3(1.0f, 1.0f, 1.0f));
+    default_material.specular = std::make_unique<texture>();
+    default_material.ambient = std::make_unique<texture>();
+    default_material.emissive = std::make_unique<texture>();
+    default_material.shininess = 30;
+}
+
 mesh::~mesh()
 {
     logger::info("Releasing mesh");
@@ -164,16 +167,21 @@ mesh::~mesh()
 void mesh::render(program &prog)
 {
     glBindVertexArray(vao);
-    for (auto &o : objects) {
-        material &m = materials[o.material_idx];
-        prog.set("material.diffuse", *m.diffuse);
-        prog.set("material.specular", *m.specular);
-        prog.set("material.ambient", *m.ambient);
-        prog.set("material.emissive", *m.emissive);
-        prog.set("material.shininess", m.shininess);
+    for (auto &s : shapes) {
+        material *m;
+        if (s.material_idx < 0) {
+            m = &default_material;
+        } else {
+            m = &materials[s.material_idx];
+        }
+        prog.set("material.diffuse", *m->diffuse);
+        prog.set("material.specular", *m->specular);
+        prog.set("material.ambient", *m->ambient);
+        prog.set("material.emissive", *m->emissive);
+        prog.set("material.shininess", m->shininess);
 
-        glDrawElements(GL_TRIANGLES, o.num_indices, GL_UNSIGNED_INT,
-            (void *)((size_t)o.start_index * sizeof(indices[0])));
+        glDrawElements(GL_TRIANGLES, s.num_indices, GL_UNSIGNED_INT,
+            (void *)((size_t)s.start_index * sizeof(indices[0])));
     }
     glBindVertexArray(0);
 }

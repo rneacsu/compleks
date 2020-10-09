@@ -26,14 +26,14 @@ public:
     lighting();
     ~lighting();
 
-    void add_light(light* light);
-    void remove_light(light* light);
-    void update(program& p, glm::vec3 eye);
+    void add_light(light *light);
+    void remove_light(light *light);
+    void update(program &p, glm::vec3 eye);
 
 private:
     const unsigned int MAX_LIGHTS = 5;
 
-    std::vector<light*> lights;
+    std::vector<light *> lights;
     texture noise_texture;
 };
 

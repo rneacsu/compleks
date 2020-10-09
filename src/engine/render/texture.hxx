@@ -11,7 +11,7 @@ namespace compleks {
 class texture {
 public:
     texture(const image &img);
-    texture(glm::vec4 color);
+    texture(glm::vec3 color = glm::vec3());
     ~texture();
 
     void bind();

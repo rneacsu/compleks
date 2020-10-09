@@ -15,17 +15,17 @@ resource::resource()
 {
 }
 
-resource::resource(char const *name, char const *type)
+resource::resource(std::string name, std::string type)
 {
-    logger::info("Loading app resource "s + name);
-    HRSRC res = FindResourceA(NULL, name, type);
+    logger::info("Loading app resource " + name);
+    HRSRC res = FindResourceA(NULL, name.c_str(), type.c_str());
     if (!res) {
-        throw std::runtime_error("Could not find resource "s + name);
+        throw std::runtime_error("Could not find resource " + name);
     }
 
     HGLOBAL res_ptr = LoadResource(NULL, res);
     if (!res_ptr) {
-        throw std::runtime_error("Could not load resource "s + name);
+        throw std::runtime_error("Could not load resource " + name);
     }
 
     ptr = (char *)LockResource(res_ptr);
@@ -39,7 +39,7 @@ resource::resource(char const *name, char const *type)
     }
 }
 
-resource::resource(char const *path)
+resource::resource(std::string path)
     : path(path)
 {
     reload();

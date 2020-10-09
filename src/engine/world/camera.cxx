@@ -1,6 +1,5 @@
 #include "camera.hxx"
 
-#include <iostream>
 #include <string>
 
 #include <GLFW/glfw3.h>
@@ -27,6 +26,8 @@ void camera::update(double delta)
 
     delta *= multiplier;
 
+    old_pos = pos;
+
     pos += glm::normalize(glm::vec3(front.x, 0, front.z)) * (float)delta
         * (float)walk_front;
     pos += glm::normalize(glm::vec3(right.x, 0, right.z)) * (float)delta
@@ -46,7 +47,7 @@ glm::mat4 camera::get_view_matrix()
 
 glm::mat4 camera::get_projection_matrix(int width, int height)
 {
-    return glm::perspective(fov, width / (float)height, 0.1f, 100.0f);
+    return glm::perspective(fov, width / (float)height, 0.001f, 100.0f);
 }
 
 glm::vec3 camera::get_position()
@@ -56,15 +57,20 @@ glm::vec3 camera::get_position()
 
 void camera::set_position(glm::vec3 p)
 {
-    pos = p;
+    pos = old_pos = p;
 }
 
-void camera::set_orientation(float y, float p, float r)
+void camera::set_orientation(float p, float y, float r)
 {
-    yaw = y;
     pitch = p;
+    yaw = y;
     roll = r;
     mouse_move(0.0f, 0.0f);
+}
+
+glm::vec3 camera::get_orientation()
+{
+    return glm::vec3(pitch, yaw, roll);
 }
 
 void camera::set_enabled(bool en)
@@ -178,6 +184,11 @@ void camera::reset()
     walk_front = walk_right = elevate = tilt = 0;
     sprint = false;
     mouse_move(0.0f, 0.0f);
+}
+
+glm::vec3 camera::get_old_position(void)
+{
+    return old_pos;
 }
 
 } // namespace compleks

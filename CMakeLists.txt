@@ -1,12 +1,16 @@
 cmake_minimum_required(VERSION 3.10)
+cmake_policy(SET CMP0091 NEW)
+
+set(VCPKG_TARGET_TRIPLET "x64-windows-static")
+
 project(compleks VERSION 1.0.0)
 
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
-find_package(glfw3 REQUIRED)
-find_package(assimp CONFIG REQUIRED)
-find_path(STB_INCLUDE_DIR NAMES stb_image.h REQUIRED)
+find_path(STB_INCLUDE_DIRS stb.h REQUIRED)
+find_package(tinyobjloader CONFIG REQUIRED)
 
 set(CMAKE_CXX_FLAGS 
     "/EHsc /W4 /WX \
@@ -14,20 +18,16 @@ set(CMAKE_CXX_FLAGS
     /std:c++17"
 )
 
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS True)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_MSVC_RUNTIME_LIBRARY 
+    "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+if (CMAKE_BUILD_TYPE MATCHES Release)
+    set(CMAKE_WIN32_EXECUTABLE True)
+endif()
 
 add_subdirectory(src)
 
-install(TARGETS main compleks RUNTIME COMPONENT app)
+install(TARGETS main RUNTIME COMPONENT app)
 install(DIRECTORY res DESTINATION . COMPONENT app)
-install(CODE "
-    file(GLOB APP_DLL \"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/*.dll\")
-    file(INSTALL \${APP_DLL} DESTINATION \${CMAKE_INSTALL_PREFIX}/bin)
-" COMPONENT app)
-
-set(CMAKE_INSTALL_SYSTEM_RUNTIME_COMPONENT app)
-include(InstallRequiredSystemLibraries)
 
 set(CPACK_GENERATOR ZIP NSIS)
 set(CPACK_PACKAGE_NAME "Compleks")

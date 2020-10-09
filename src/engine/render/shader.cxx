@@ -2,15 +2,13 @@
 
 #include <memory>
 #include <stdexcept>
-#include <iostream>
 #include <string>
 
 #include "../utils/logger.hxx"
 
 using namespace std::literals;
 
-namespace compleks
-{
+namespace compleks {
 
 shader::shader(type t)
 {
@@ -31,7 +29,7 @@ bool shader::compile(std::unique_ptr<resource> source)
 
     glShaderSource(id, 1, (char **)&src->ptr, (int *)&src->size);
     glCompileShader(id);
-    
+
     int status, length;
     glGetShaderiv(id, GL_COMPILE_STATUS, &status);
     if (!status) {

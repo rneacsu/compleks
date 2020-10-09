@@ -22,7 +22,7 @@ texture::texture(const image &img)
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 
-texture::texture(glm::vec4 color)
+texture::texture(glm::vec3 color)
 {
     logger::info("Creating color texture ");
     glGenTextures(1, &id);
@@ -32,7 +32,7 @@ texture::texture(glm::vec4 color)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_FLOAT,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGB, GL_FLOAT,
         glm::value_ptr(color));
 }
 

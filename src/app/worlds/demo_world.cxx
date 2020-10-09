@@ -14,7 +14,7 @@ demo_world::demo_world()
 
     glClearColor(135 / 255.0f, 206 / 255.0f, 235 / 255.0f, 1.0f);
 
-    load_mesh("cube", "res/cube.dae");
+    load_mesh("cube", "res/cube.obj");
     cube = std::make_shared<compleks::object>("cube");
     plane = std::make_shared<compleks::object>("quad");
 
@@ -29,9 +29,10 @@ demo_world::demo_world()
     p1 = std::make_shared<compleks::portal>();
     p2 = std::make_shared<compleks::portal>();
 
+    // p1->pos = { 2, 0.5, 0 };
     p1->pos = { 0, 0.5, -2 };
     p1->scale = { 2, 4, 1 };
-    // p1.quat = glm::quat({ 0.0f, glm::radians(-90.0f), 0.0f });
+    // p1->quat = glm::quat({ 0.0f, glm::radians(-90.0f), 0.0f });
 
     p2->pos = { 0, 0.5, 2 };
     p2->scale = { 2, 4, 1 };

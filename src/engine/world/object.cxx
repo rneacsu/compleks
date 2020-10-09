@@ -9,7 +9,7 @@ object::object(std::string mesh_id)
 {
     pos = { 0, 0, 0 };
     scale = { 1, 1, 1 };
-    quat = glm::quat();
+    quat = glm::quat(glm::vec3(0, 0, 0));
 }
 
 glm::mat4 object::get_model_matrix(void)

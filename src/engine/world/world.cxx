@@ -100,12 +100,18 @@ void world::render(double delta)
 
     camera.update(delta);
 
-    glm::mat4 view = camera.get_view_matrix();
-    glm::mat4 proj = camera.get_projection_matrix(w, h);
-
     for (auto &obj : objects) {
         obj->update_all(delta);
     }
+
+    for (auto &p : portals) {
+        if (p->pass(camera)) {
+            break;
+        }
+    }
+
+    glm::mat4 view = camera.get_view_matrix();
+    glm::mat4 proj = camera.get_projection_matrix(w, h);
 
     render_portals(view, proj);
 }

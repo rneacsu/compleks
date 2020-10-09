@@ -106,7 +106,7 @@ void program::set(std::string var, glm::mat4 value)
     glUniformMatrix4fv(get_location(var), 1, GL_FALSE, glm::value_ptr(value));
 }
 
-void program::set(std::string var, texture& tex)
+void program::set(std::string var, texture &tex)
 {
     if (!linked)
         return;
