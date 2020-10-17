@@ -93,12 +93,28 @@ bool portal::pass(camera &c)
         return false;
     }
 
+    glm::vec3 new_pos = t->quat * glm::quat({ 0.0f, glm::pi<float>(), 0.0f })
+            * glm::inverse(quat) * (cur - pos)
+        + t->pos;
+
     float delta = glm::dot(n, cur - exit);
-    if (delta < 0) {
-        c.set_position(cur + t->pos - pos);
-    } else {
-        c.set_position(cur + t->pos - pos - n * delta);
+    if (delta > 0) {
+        new_pos -= n * delta;
     }
+    c.set_position(new_pos);
+
+    glm::vec3 tn = t->quat * glm::vec3(0, 0, 1);
+    glm::vec3 cur_o, target_o, cam_o;
+    cur_o = { glm::atan(n.y, glm::sqrt(n.x * n.x + n.z * n.z)),
+        glm::atan(n.z, n.x), 0.0f };
+    target_o = { glm::atan(tn.y, glm::sqrt(tn.x * tn.x + tn.z * tn.z)),
+        glm::atan(tn.z, tn.x), 0.0f };
+    cam_o = c.get_orientation();
+
+    cam_o.x += target_o.x + cur_o.x;
+    cam_o.y += target_o.y - cur_o.y + glm::pi<float>();
+
+    c.set_orientation(cam_o.x, cam_o.y, cam_o.z);
 
     return true;
 }
