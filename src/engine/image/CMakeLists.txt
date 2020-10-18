@@ -1,1 +1,1 @@
-add_library(compleks_image OBJECT image.cxx)
+add_library(compleks_image OBJECT image.cxx bayer.cxx)

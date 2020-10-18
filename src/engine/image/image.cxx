@@ -13,6 +13,12 @@
 
 namespace compleks {
 
+image::image()
+{
+    pixels = nullptr;
+    width = height = 0;
+}
+
 image::image(const resource &res)
 {
     int n;
@@ -29,8 +35,10 @@ image::image(const resource &res)
 
 image::~image()
 {
-    logger::info("Releasing image");
-    stbi_image_free(pixels);
+    if (pixels) {
+        logger::info("Releasing image");
+        stbi_image_free(pixels);
+    }
 }
 
 } // namespace compleks

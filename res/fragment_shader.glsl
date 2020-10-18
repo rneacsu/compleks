@@ -55,27 +55,27 @@ vec3 add_light(vec3 color)
             vec3 N = f_normal;
             float d = distance(lights[i].pos, f_vertex);
 
-            float attenuation = 1.0f / 
-                (lights[i].attenuation.x 
-                + lights[i].attenuation.y * d 
+            float attenuation = 1.0f /
+                (lights[i].attenuation.x
+                + lights[i].attenuation.y * d
                 + lights[i].attenuation.z * d * d);
 
             if (spot_enable) {
                 attenuation *= pow((spot_angle - spot_limit) / (1 - spot_limit), 2);
             }
-            
+
             color += vec3(texture(material.emissive, f_tex_coord));
-            color += vec3(texture(material.ambient, f_tex_coord)) 
+            color += vec3(texture(material.ambient, f_tex_coord))
                 * lights[i].ambient;
 
             if (dot(N, L) > 0) {
-                color += vec3(texture(material.diffuse, f_tex_coord)) 
-                    * lights[i].diffuse 
-                    * dot(N, L) 
+                color += vec3(texture(material.diffuse, f_tex_coord))
+                    * lights[i].diffuse
+                    * dot(N, L)
                     * attenuation;
-                color += vec3(texture(material.specular, f_tex_coord))  
-                    * lights[i].specular 
-                    * pow(max(dot(N, H), 0), material.shininess) 
+                color += vec3(texture(material.specular, f_tex_coord))
+                    * lights[i].specular
+                    * pow(max(dot(N, H), 0), material.shininess)
                     * attenuation;
                 dither = true;
             }
@@ -84,9 +84,9 @@ vec3 add_light(vec3 color)
 
     if (dither) {
         ivec2 noise_size = textureSize(light_noise, 0);
-        float noise = texture(light_noise, gl_FragCoord.xy / noise_size).r;
+        float noise = texture(light_noise, gl_FragCoord.xy / noise_size).r * 4;
         // if (gl_FragCoord.x > 320) {
-            color += mix(-0.5/255.0, 0.5/255.0, noise);
+            color += vec3(noise - 0.5) / 48.0f;
             // color = vec3(noise);
         // }
     }

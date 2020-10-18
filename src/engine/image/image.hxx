@@ -10,6 +10,7 @@ public:
     int width, height;
     unsigned char *pixels;
 
+    image(void);
     image(const resource &res);
     ~image();
 };

@@ -4,14 +4,14 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include "../image/image.hxx"
+#include "../image/bayer.hxx"
 #include "../utils/logger.hxx"
 #include "../utils/resource.hxx"
 
 namespace compleks {
 
 lighting::lighting()
-    : noise_texture(resource("res/noise.png"))
+    : noise_texture(bayer(), texture::mode::NEAREST)
 {
 }
 
