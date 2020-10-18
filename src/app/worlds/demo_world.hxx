@@ -8,7 +8,7 @@ public:
     demo_world();
 
 private:
-    compleks::lighting::light sun;
+    std::shared_ptr<compleks::lighting::light> sun;
     std::shared_ptr<compleks::object> plane, cube;
     std::shared_ptr<compleks::portal> p1, p2;
 };

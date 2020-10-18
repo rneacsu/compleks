@@ -3,7 +3,7 @@
 #define MAX_LIGHTS 5
 
 struct light_t {
-    bool on;
+    bool off;
     vec3 pos;
     vec3 ambient;
     vec3 diffuse;
@@ -40,7 +40,7 @@ vec3 add_light(vec3 color)
     bool dither = false;
 
     for (int i = 0; i < MAX_LIGHTS; i++) {
-        if (!lights[i].on) {
+        if (lights[i].off) {
             continue;
         }
 

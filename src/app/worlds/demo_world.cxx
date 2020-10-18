@@ -2,15 +2,11 @@
 
 demo_world::demo_world()
 {
-    sun.ambient = glm::vec3(1.0f, 1.0f, 1.0f) * 0.25f;
-    sun.diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
-    sun.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    sun.pos = glm::vec3(40, 50, 60);
-    // sun.attenuation = glm::vec3(1, 0.01, 0.001);
-    sun.attenuation = glm::vec3(1, 0, 0);
-    sun.cut_off = glm::radians(10.0f);
-    sun.direction = glm::normalize(-sun.pos);
-    lighting.add_light(&sun);
+    sun = std::make_shared<compleks::lighting::light>();
+    sun->pos = glm::vec3(40, 50, 60);
+    sun->cut_off = glm::radians(10.0f);
+    sun->direction = glm::normalize(-sun->pos);
+    lighting.add_light(sun);
 
     glClearColor(135 / 255.0f, 206 / 255.0f, 235 / 255.0f, 1.0f);
 
@@ -29,14 +25,14 @@ demo_world::demo_world()
     p1 = std::make_shared<compleks::portal>();
     p2 = std::make_shared<compleks::portal>();
 
-    p1->pos = { 2, 0.5, 0 };
-    // p1->pos = { 0, 0.5, -2 };
+    p1->pos = { 0, 0.5, -2 };
     p1->scale = { 2, 4, 1 };
-    p1->quat = glm::quat({ 0.0f, glm::radians(-90.0f), 0.0f });
 
-    p2->pos = { 0, 0.5, 2 };
+    p2->pos = { -2, 0.5, 0 };
+    // p2->pos = { 0, 0.5, 2 };
     p2->scale = { 2, 4, 1 };
-    p2->quat = glm::quat({ 0.0f, glm::radians(180.0f), 0.0f });
+    p2->quat = glm::quat({ 0.0f, glm::radians(90.0f), 0.0f });
+    // p2->quat = glm::quat({ 0.0f, glm::radians(180.0f), 0.0f });
 
     p1->set_target(p2);
     p2->set_target(p1);
