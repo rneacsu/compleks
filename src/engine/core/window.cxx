@@ -2,6 +2,9 @@
 
 #include <stdexcept>
 
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+
 namespace compleks {
 
 window::window()
@@ -41,6 +44,14 @@ void window::set_icon(const image &icon)
     img.height = icon.height;
     img.pixels = icon.pixels;
     glfwSetWindowIcon(ctx, 1, &img);
+}
+
+void window::set_icon(int res_id)
+{
+    HWND win_h = glfwGetWin32Window(ctx);
+    HICON icon_h = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(res_id));
+    SendMessage(win_h, WM_SETICON, ICON_SMALL, (LPARAM)icon_h);
+    SendMessage(win_h, WM_SETICON, ICON_BIG, (LPARAM)icon_h);
 }
 
 window::~window()

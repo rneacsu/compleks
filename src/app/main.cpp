@@ -3,6 +3,7 @@
 
 #include <compleks.h>
 
+#include "resource.h"
 #include "worlds/demo_world.hxx"
 
 using namespace std::literals;
@@ -14,8 +15,7 @@ int main(int, char *[])
     try {
         demo_world win;
 
-        win.set_icon(
-            compleks::image(compleks::resource("APP_WINDOW_ICON", "IMAGE")));
+        win.set_icon(APP_ICON);
         win.run();
 
     } catch (std::exception &e) {
