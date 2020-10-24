@@ -12,21 +12,20 @@ find_package(glm CONFIG REQUIRED)
 find_path(STB_INCLUDE_DIRS stb.h REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
 
-set(CMAKE_CXX_FLAGS 
+set(CMAKE_CXX_FLAGS
     "/EHsc /W4 /WX \
     /experimental:external /external:anglebrackets /external:W0 \
     /std:c++17"
 )
 
-set(CMAKE_MSVC_RUNTIME_LIBRARY 
-    "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if (CMAKE_BUILD_TYPE MATCHES Release)
     set(CMAKE_WIN32_EXECUTABLE True)
 endif()
 
 add_subdirectory(src)
 
-install(TARGETS main RUNTIME COMPONENT app)
+install(TARGETS main RUNTIME DESTINATION . COMPONENT app)
 install(DIRECTORY res DESTINATION . COMPONENT app)
 
 set(CPACK_GENERATOR ZIP NSIS)
@@ -40,8 +39,9 @@ set(CPACK_COMPONENT_APP_REQUIRED True)
 set(CPACK_COMPONENT_APP_DISPLAY_NAME "Compleks")
 
 set(CPACK_NSIS_MUI_ICON ${CMAKE_SOURCE_DIR}/res/app.ico)
+set(CPACK_NSIS_EXECUTABLES_DIRECTORY .)
 set(CPACK_NSIS_MUI_FINISHPAGE_RUN main.exe)
-set(CPACK_NSIS_INSTALLED_ICON_NAME bin/main.exe)
+set(CPACK_NSIS_INSTALLED_ICON_NAME main.exe)
 set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL On)
 
 include(CPack)
