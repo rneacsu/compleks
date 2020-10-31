@@ -42,6 +42,7 @@ protected:
 private:
     GLenum polygon_mode = GL_FILL;
     int max_portal_depth = 4;
+    bool vr = false;
 };
 
 }

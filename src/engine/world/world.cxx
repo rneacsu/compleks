@@ -29,6 +29,8 @@ world::world()
 
 void world::key_down(int key, int mods)
 {
+    int w, h, xpos, ypos;
+
     input_window::key_down(key, mods);
     switch (key) {
     case GLFW_KEY_ESCAPE:
@@ -64,6 +66,20 @@ void world::key_down(int key, int mods)
         glPolygonMode(GL_FRONT_AND_BACK, polygon_mode);
 
         break;
+    case GLFW_KEY_V:
+        vr = !vr;
+        if (!fullscreen) {
+            glfwGetWindowSize(ctx, &w, &h);
+            glfwGetWindowPos(ctx, &xpos, &ypos);
+            if (vr) {
+                glfwSetWindowSize(ctx, w * 2, h);
+                glfwSetWindowPos(ctx, xpos - w / 2, ypos);
+            } else {
+                glfwSetWindowSize(ctx, w / 2, h);
+                glfwSetWindowPos(ctx, xpos + w / 4, ypos);
+            }
+        }
+        break;
     }
 }
 
@@ -94,8 +110,6 @@ void world::render(double delta)
     if (w == 0 || h == 0) {
         return;
     }
-
-    glViewport(0, 0, w, h);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     camera.update(delta);
@@ -110,10 +124,21 @@ void world::render(double delta)
         }
     }
 
-    glm::mat4 view = camera.get_view_matrix();
-    glm::mat4 proj = camera.get_projection_matrix(w, h);
-
-    render_portals(view, proj);
+    glm::mat4 view, proj;
+    if (!vr) {
+        glViewport(0, 0, w, h);
+        view = camera.get_view_matrix();
+        proj = camera.get_projection_matrix(w, h);
+        render_portals(view, proj);
+    } else {
+        proj = camera.get_projection_matrix(w / 2, h);
+        glViewport(0, 0, w / 2, h);
+        view = camera.get_view_matrix(camera::view_type::LEFT);
+        render_portals(view, proj);
+        glViewport(w / 2, 0, w / 2, h);
+        view = camera.get_view_matrix(camera::view_type::RIGHT);
+        render_portals(view, proj);
+    }
 }
 
 void world::render_objects(glm::mat4 view, glm::mat4 proj)

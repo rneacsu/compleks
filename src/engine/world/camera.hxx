@@ -9,11 +9,13 @@ namespace compleks {
 
 class camera : public input_listener {
 public:
+    enum view_type { CENTER, LEFT, RIGHT };
+
     camera();
 
     void update(double delta);
 
-    glm::mat4 get_view_matrix();
+    glm::mat4 get_view_matrix(view_type t = CENTER);
     glm::mat4 get_projection_matrix(int width, int height);
 
     glm::vec3 get_old_position();
@@ -44,6 +46,7 @@ private:
     float max_speed = 3.0f;
     float sprint_multiplier = 2;
     float drag_factor = 10;
+    float eye_distance = 0.50f;
 };
 
 } // namespace compleks

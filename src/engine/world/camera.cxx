@@ -47,9 +47,19 @@ void camera::update(double delta)
     }
 }
 
-glm::mat4 camera::get_view_matrix()
+glm::mat4 camera::get_view_matrix(view_type t)
 {
-    return glm::lookAt(pos, pos + front, up);
+    glm::vec3 eye_pos = pos;
+    switch (t) {
+    case LEFT:
+        eye_pos -= right * (eye_distance / 2);
+        break;
+    case RIGHT:
+        eye_pos += right * (eye_distance / 2);
+        break;
+    }
+
+    return glm::lookAt(eye_pos, eye_pos + front, up);
 }
 
 glm::mat4 camera::get_projection_matrix(int width, int height)
