@@ -15,11 +15,17 @@ public:
 
     glm::mat4 get_view_matrix();
     glm::mat4 get_projection_matrix(int width, int height);
-    glm::vec3 get_position();
+
     glm::vec3 get_old_position();
-    glm::vec3 get_orientation();
+    glm::vec3 get_position();
     void set_position(glm::vec3 pos);
-    void set_orientation(float yaw, float pitch, float roll);
+
+    glm::vec3 get_orientation();
+    void set_orientation(glm::vec3 euler);
+
+    glm::vec3 get_velocity();
+    void set_velocity(glm::vec3 v);
+
     void set_enabled(bool);
     void reset();
 
@@ -30,10 +36,14 @@ public:
 
 private:
     float yaw, pitch, roll, fov;
-    glm::vec3 pos, old_pos, front, up, right;
+    glm::vec3 pos, old_pos, front, up, right, velocity, acceleration;
     char walk_front, walk_right, elevate, tilt;
     bool sprint = false;
     bool enabled = false;
+    float sensitivity = 0.005f;
+    float max_speed = 3.0f;
+    float sprint_multiplier = 2;
+    float drag_factor = 10;
 };
 
 } // namespace compleks

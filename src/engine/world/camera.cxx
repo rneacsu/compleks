@@ -1,5 +1,6 @@
 #include "camera.hxx"
 
+#include <iostream>
 #include <string>
 
 #include <GLFW/glfw3.h>
@@ -22,17 +23,23 @@ void camera::update(double delta)
         return;
     }
 
-    float multiplier = sprint ? 3.0f : 1.5f;
-
-    delta *= multiplier;
-
     old_pos = pos;
 
-    pos += glm::normalize(glm::vec3(front.x, 0, front.z)) * (float)delta
-        * (float)walk_front;
-    pos += glm::normalize(glm::vec3(right.x, 0, right.z)) * (float)delta
-        * (float)walk_right;
-    pos += glm::normalize(glm::vec3(0, 1, 0)) * (float)delta * (float)elevate;
+    if (walk_front || walk_right || elevate) {
+        acceleration
+            = glm::normalize(glm::vec3(front.x, 0, front.z)) * (float)walk_front
+            + glm::normalize(glm::vec3(right.x, 0, right.z)) * (float)walk_right
+            + glm::vec3(0, 1, 0) * (float)elevate;
+        acceleration = glm::normalize(acceleration)
+            * (sprint ? sprint_multiplier : 1.0f);
+    } else {
+        acceleration = glm::vec3();
+    }
+
+    velocity
+        += (acceleration * drag_factor * max_speed - velocity * drag_factor)
+        * (float)delta;
+    pos += velocity * (float)delta;
 
     if (tilt) {
         roll += tilt * (float)delta;
@@ -60,11 +67,21 @@ void camera::set_position(glm::vec3 p)
     pos = old_pos = p;
 }
 
-void camera::set_orientation(float p, float y, float r)
+glm::vec3 camera::get_velocity()
 {
-    pitch = p;
-    yaw = y;
-    roll = r;
+    return velocity;
+}
+
+void camera::set_velocity(glm::vec3 v)
+{
+    velocity = v;
+}
+
+void camera::set_orientation(glm::vec3 euler)
+{
+    pitch = euler.x;
+    yaw = euler.y;
+    roll = euler.z;
     mouse_move(0.0f, 0.0f);
 }
 
@@ -152,8 +169,8 @@ void camera::mouse_move(float dx, float dy)
         return;
     }
 
-    yaw += (dx * cos(roll) + dy * sin(roll)) * 0.005f;
-    pitch += (dx * sin(roll) - dy * cos(roll)) * 0.005f;
+    yaw += (dx * cos(roll) + dy * sin(roll)) * sensitivity;
+    pitch += (dx * sin(roll) - dy * cos(roll)) * sensitivity;
     pitch
         = glm::min(glm::max(pitch, glm::radians(-89.0f)), glm::radians(89.0f));
 
@@ -182,6 +199,7 @@ void camera::reset()
     roll = 0;
     fov = glm::radians(60.0f);
     walk_front = walk_right = elevate = tilt = 0;
+    acceleration = velocity = glm::vec3();
     sprint = false;
     mouse_move(0.0f, 0.0f);
 }

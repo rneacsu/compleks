@@ -114,7 +114,12 @@ bool portal::pass(camera &c)
     cam_o.x += target_o.x + cur_o.x;
     cam_o.y += target_o.y - cur_o.y + glm::pi<float>();
 
-    c.set_orientation(cam_o.x, cam_o.y, cam_o.z);
+    c.set_orientation(cam_o);
+
+    glm::vec3 vel = c.get_velocity();
+    vel = t->quat * glm::quat({ 0.0f, glm::pi<float>(), 0.0f })
+        * glm::inverse(quat) * vel;
+    c.set_velocity(vel);
 
     return true;
 }
