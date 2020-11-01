@@ -4,10 +4,8 @@
 #include <memory>
 #include <vector>
 
-#include <GL/glew.h>
 #include <glm/glm.hpp>
 
-#include "program.hxx"
 #include "texture.hxx"
 
 namespace compleks {
@@ -30,7 +28,7 @@ public:
 
     void add_light(std::shared_ptr<light> l);
     void remove_light(std::shared_ptr<light> l);
-    void update(program &p, glm::vec3 eye);
+    void update(glm::vec3 eye);
 
 private:
     const unsigned int MAX_LIGHTS = 5;

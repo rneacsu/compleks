@@ -1,11 +1,12 @@
 #ifndef COMPLEKS_CORE_WINDOW_HXX
 #define COMPLEKS_CORE_WINDOW_HXX
 
+#include <mutex>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include "../image/image.hxx"
-#include "engine.hxx"
 
 namespace compleks {
 
@@ -28,12 +29,15 @@ public:
 
 protected:
     GLFWwindow *ctx;
-    double old_time = 0;
     bool fullscreen = false;
-    engine en;
+    int width, height, x, y;
 
 private:
-    int width, height, x, y;
+    static std::mutex lock;
+    static int instances;
+    double old_time = 0;
+
+    static void glfw_error_func(int, const char *);
 };
 
 }

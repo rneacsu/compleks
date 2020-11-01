@@ -3,7 +3,7 @@
 
 #include <glm/glm.hpp>
 
-#include "../input/input_listener.hxx"
+#include "../window/input_listener.hxx"
 
 namespace compleks {
 
@@ -46,7 +46,7 @@ private:
     float max_speed = 3.0f;
     float sprint_multiplier = 2;
     float drag_factor = 10;
-    float eye_distance = 0.50f;
+    float eye_distance = 0.30f;
 };
 
 } // namespace compleks

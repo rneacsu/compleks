@@ -1,0 +1,45 @@
+#include "context.hxx"
+
+#include <stdexcept>
+
+#include "../utils/logger.hxx"
+
+namespace compleks {
+
+context::context()
+{
+    logger::info("Initializing context");
+
+    glfwMakeContextCurrent(ctx);
+    glfwSwapInterval(1);
+
+    GLenum err = glewInit();
+    if (err != GLEW_OK) {
+        throw std::runtime_error((char *)glewGetErrorString(err));
+    }
+
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(gl_log_func, NULL);
+}
+
+context::~context()
+{
+    logger::info("Destroying context");
+}
+
+void context::gl_log_func(GLenum source, GLenum type, GLuint id,
+    GLenum severity, GLsizei length, const GLchar *message, const void *)
+{
+    std::string log = "source " + std::to_string(source) + " type "
+        + std::to_string(type) + " id " + std::to_string(id) + " severity "
+        + std::to_string(severity) + ":\n"
+        + (length < 0 ? message : std::string(message, length));
+
+    if (type == GL_DEBUG_TYPE_ERROR) {
+        logger::error("GL error: " + log);
+    } else {
+        logger::info("GL log: " + log);
+    }
+}
+
+} // namespace compleks

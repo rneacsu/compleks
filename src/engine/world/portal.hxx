@@ -1,12 +1,12 @@
 #ifndef __COMPLEKS_WORLD_PORTAL_HXX
 #define __COMPLEKS_WORLD_PORTAL_HXX
 
+#include <memory>
+
+#include "camera.hxx"
 #include "object.hxx"
 
 namespace compleks {
-
-class camera;
-class world;
 
 class portal : public object {
 public:

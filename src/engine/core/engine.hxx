@@ -4,25 +4,29 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "../render/lighting.hxx"
 #include "../render/mesh.hxx"
+#include "../render/program.hxx"
 #include "../utils/library.hxx"
+#include "context.hxx"
 
 namespace compleks {
 
-class engine {
+class engine : public context {
 public:
-    library<mesh> mesh_library;
+    library<mesh> meshes;
+    program prog;
+    lighting light;
 
     engine();
     ~engine();
 
-    void enable_gl_logs();
+    static program &get_program(void);
+    static library<mesh> &get_meshes(void);
+    static lighting &get_lighting(void);
 
 private:
-    static void glfw_error_func(int, const char *);
-    static void gl_log_func(GLenum source, GLenum type, GLuint id,
-        GLenum severity, GLsizei length, const GLchar *message,
-        const void *userParam);
+    static thread_local engine *instance;
 };
 
 }

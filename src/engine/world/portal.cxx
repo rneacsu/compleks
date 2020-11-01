@@ -4,9 +4,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
-#include "camera.hxx"
-#include "world.hxx"
-
 namespace compleks {
 
 portal::portal()

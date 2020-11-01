@@ -3,11 +3,10 @@
 
 #include <list>
 #include <map>
-#include <tuple>
 #include <utility>
 
-#include "../core/window.hxx"
 #include "input_listener.hxx"
+#include "window.hxx"
 
 namespace compleks {
 

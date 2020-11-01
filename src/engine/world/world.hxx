@@ -3,21 +3,16 @@
 
 #include <memory>
 #include <string>
-#include <utility>
 #include <vector>
 
-#include "../input/input_window.hxx"
-#include "../render/lighting.hxx"
-#include "../render/mesh.hxx"
-#include "../render/shader.hxx"
-#include "../utils/resource.hxx"
+#include "../core/engine.hxx"
 #include "camera.hxx"
 #include "object.hxx"
 #include "portal.hxx"
 
 namespace compleks {
 
-class world : public input_window {
+class world : public engine {
 public:
     world();
     ~world();
@@ -31,13 +26,14 @@ public:
     void render_objects(glm::mat4 view, glm::mat4 proj);
     void render_portals(glm::mat4 view, glm::mat4 proj, int depth = 0,
         std::shared_ptr<portal> current_portal = nullptr);
+    void render_vr(int w, int h);
+
+    void set_transform(glm::mat4 view, glm::mat4 proj);
 
 protected:
     std::vector<std::shared_ptr<object>> objects;
     std::vector<std::shared_ptr<portal>> portals;
-    program program;
     camera camera;
-    lighting lighting;
 
 private:
     GLenum polygon_mode = GL_FILL;

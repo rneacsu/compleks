@@ -5,9 +5,8 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "../core/engine.hxx"
 #include "../utils/logger.hxx"
-
-using namespace std::literals;
 
 namespace compleks {
 
@@ -29,8 +28,6 @@ world::world()
 
 void world::key_down(int key, int mods)
 {
-    int w, h, xpos, ypos;
-
     input_window::key_down(key, mods);
     switch (key) {
     case GLFW_KEY_ESCAPE:
@@ -51,7 +48,7 @@ void world::key_down(int key, int mods)
         break;
     case GLFW_KEY_F10:
         logger::info("Recompiling shaders...");
-        program.update_shaders();
+        engine::get_program().update_shaders();
         break;
     case GLFW_KEY_F12:
         if (polygon_mode == GL_FILL) {
@@ -69,14 +66,12 @@ void world::key_down(int key, int mods)
     case GLFW_KEY_V:
         vr = !vr;
         if (!fullscreen) {
-            glfwGetWindowSize(ctx, &w, &h);
-            glfwGetWindowPos(ctx, &xpos, &ypos);
             if (vr) {
-                glfwSetWindowSize(ctx, w * 2, h);
-                glfwSetWindowPos(ctx, xpos - w / 2, ypos);
+                glfwSetWindowSize(ctx, width * 2, height);
+                glfwSetWindowPos(ctx, x - width / 2, y);
             } else {
-                glfwSetWindowSize(ctx, w / 2, h);
-                glfwSetWindowPos(ctx, xpos + w / 4, ypos);
+                glfwSetWindowSize(ctx, width / 2, height);
+                glfwSetWindowPos(ctx, x + width / 4, y);
             }
         }
         break;
@@ -99,7 +94,7 @@ world::~world()
 
 void world::load_mesh(std::string id, std::string path)
 {
-    en.mesh_library.add(id, path);
+    engine::get_meshes().add(id, path);
 }
 
 void world::render(double delta)
@@ -110,7 +105,6 @@ void world::render(double delta)
     if (w == 0 || h == 0) {
         return;
     }
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     camera.update(delta);
 
@@ -124,32 +118,27 @@ void world::render(double delta)
         }
     }
 
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glViewport(0, 0, w, h);
     glm::mat4 view, proj;
+    view = camera.get_view_matrix();
+    proj = camera.get_projection_matrix(w, h);
     if (!vr) {
-        glViewport(0, 0, w, h);
-        view = camera.get_view_matrix();
-        proj = camera.get_projection_matrix(w, h);
         render_portals(view, proj);
     } else {
-        proj = camera.get_projection_matrix(w / 2, h);
-        glViewport(0, 0, w / 2, h);
-        view = camera.get_view_matrix(camera::view_type::LEFT);
-        render_portals(view, proj);
-        glViewport(w / 2, 0, w / 2, h);
-        view = camera.get_view_matrix(camera::view_type::RIGHT);
-        render_portals(view, proj);
+        render_vr(w, h);
     }
 }
 
 void world::render_objects(glm::mat4 view, glm::mat4 proj)
 {
     glm::vec3 eye_pos = glm::inverse(view) * glm::vec4(glm::vec3(0), 1);
-    lighting.update(program, eye_pos);
+    engine::get_lighting().update(eye_pos);
 
-    program.set("projection_view_matrix", proj * view);
+    set_transform(view, proj);
 
     for (auto &obj : objects) {
-        obj->render(en, program);
+        obj->render();
     }
 }
 
@@ -171,8 +160,8 @@ void world::render_portals(glm::mat4 view, glm::mat4 proj, int depth,
         glStencilOp(GL_INCR, GL_KEEP, GL_KEEP);
         glStencilMask(0xFF);
 
-        program.set("projection_view_matrix", proj * view);
-        p->render(en, program);
+        set_transform(view, proj);
+        p->render();
 
         glm::mat4 new_view = p->modify_view_matrix(view);
         glm::mat4 new_proj = p->modify_proj_matrix(view, proj);
@@ -201,8 +190,8 @@ void world::render_portals(glm::mat4 view, glm::mat4 proj, int depth,
         glStencilFunc(GL_NOTEQUAL, depth + 1, 0xFF);
         glStencilOp(GL_DECR, GL_KEEP, GL_KEEP);
 
-        program.set("projection_view_matrix", proj * view);
-        p->render(en, program);
+        set_transform(view, proj);
+        p->render();
     }
 
     glDisable(GL_STENCIL_TEST);
@@ -214,9 +203,9 @@ void world::render_portals(glm::mat4 view, glm::mat4 proj, int depth,
     glDepthFunc(GL_ALWAYS);
 
     glClear(GL_DEPTH_BUFFER_BIT);
-    program.set("projection_view_matrix", proj * view);
+    set_transform(view, proj);
     for (auto &p : portals)
-        p->render(en, program);
+        p->render();
 
     glDepthFunc(GL_LESS);
 
@@ -229,6 +218,25 @@ void world::render_portals(glm::mat4 view, glm::mat4 proj, int depth,
     glEnable(GL_DEPTH_TEST);
 
     render_objects(view, proj);
+}
+
+void world::render_vr(int w, int h)
+{
+    glm::mat4 proj, view;
+    proj = camera.get_projection_matrix(w / 2, h);
+
+    glViewport(0, 0, w / 2, h);
+    view = camera.get_view_matrix(camera::view_type::LEFT);
+    render_portals(view, proj);
+
+    glViewport(w / 2, 0, w / 2, h);
+    view = camera.get_view_matrix(camera::view_type::RIGHT);
+    render_portals(view, proj);
+}
+
+void world::set_transform(glm::mat4 view, glm::mat4 proj)
+{
+    engine::get_program().set("projection_view_matrix", proj * view);
 }
 
 }

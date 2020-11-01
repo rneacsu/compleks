@@ -6,11 +6,6 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
-
-#include "../core/engine.hxx"
-#include "../render/mesh.hxx"
-#include "../render/program.hxx"
 
 namespace compleks {
 
@@ -25,7 +20,7 @@ public:
     virtual void update(double delta);
     void update_all(double delta);
 
-    void render(engine &en, program &prog, glm::mat4 transform = glm::mat4(1));
+    void render(glm::mat4 transform = glm::mat4(1));
 
     glm::mat4 get_model_matrix(void);
     glm::mat4 get_view_matrix(void);

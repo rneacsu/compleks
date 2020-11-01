@@ -6,7 +6,7 @@ demo_world::demo_world()
     sun->pos = glm::vec3(40, 50, 60);
     sun->cut_off = glm::radians(10.0f);
     sun->direction = glm::normalize(-sun->pos);
-    lighting.add_light(sun);
+    compleks::engine::get_lighting().add_light(sun);
 
     glClearColor(135 / 255.0f, 206 / 255.0f, 235 / 255.0f, 1.0f);
 

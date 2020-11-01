@@ -2,6 +2,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "../core/engine.hxx"
+
 namespace compleks {
 
 object::object(std::string mesh_id)
@@ -22,18 +24,18 @@ glm::mat4 object::get_view_matrix(void)
     return glm::translate(glm::mat4(1), pos) * glm::mat4_cast(quat);
 }
 
-void object::render(engine &en, program &prog, glm::mat4 transform)
+void object::render(glm::mat4 transform)
 {
     transform *= get_model_matrix();
 
-    prog.set("model_matrix", transform);
+    engine::get_program().set("model_matrix", transform);
 
     if (!mesh_id.empty()) {
-        en.mesh_library.get(mesh_id).render(prog);
+        engine::get_meshes().get(mesh_id).render();
     }
 
     for (auto &child : children) {
-        child.render(en, prog, transform);
+        child.render(transform);
     }
 }
 

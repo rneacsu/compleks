@@ -1,14 +1,33 @@
 #include "window.hxx"
 
 #include <stdexcept>
+#include <string>
+
+#include "../utils/logger.hxx"
 
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 
 namespace compleks {
 
+int window::instances = 0;
+std::mutex window::lock;
+
 window::window()
 {
+    {
+        std::lock_guard<std::mutex> guard(lock);
+
+        if (instances++ == 0) {
+            logger::info("Initializing window library");
+            if (!glfwInit()) {
+                throw std::runtime_error("Could not initialize window library");
+            }
+
+            glfwSetErrorCallback(glfw_error_func);
+        }
+    }
+
     glfwWindowHint(GLFW_SAMPLES, 4);
 
     ctx = glfwCreateWindow(
@@ -17,18 +36,15 @@ window::window()
         throw std::runtime_error("Could not create window");
     }
 
-    glfwMakeContextCurrent(ctx);
-
-    GLenum err = glewInit();
-    if (err != GLEW_OK) {
-        throw std::runtime_error((char *)glewGetErrorString(err));
-    }
-
-    en.enable_gl_logs();
-
     const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
     glfwSetWindowPos(ctx, (mode->width - DEFAULT_WIDTH) / 2,
         (mode->height - DEFAULT_HEIGHT) / 2);
+}
+
+void window::glfw_error_func(int code, const char *msg)
+{
+    logger::error(
+        std::string("GLFW error: ") + msg + " (" + std::to_string(code) + ")");
 }
 
 void window::config(char const *title, int w, int h)
@@ -57,14 +73,23 @@ void window::set_icon(int res_id)
 window::~window()
 {
     glfwDestroyWindow(ctx);
+
+    {
+        std::lock_guard<std::mutex> guard(lock);
+
+        if (--instances == 0) {
+            logger::info("Closing window library");
+            glfwTerminate();
+        }
+    }
 }
 
 void window::run()
 {
-    glfwMakeContextCurrent(ctx);
-    glfwSwapInterval(1);
-
     while (!glfwWindowShouldClose(ctx)) {
+        glfwGetWindowSize(ctx, &width, &height);
+        glfwGetWindowPos(ctx, &x, &y);
+
         double time = glfwGetTime();
 
         render(time - old_time);
@@ -80,13 +105,17 @@ void window::toggle_fullscreen()
     GLFWmonitor *monitor = glfwGetPrimaryMonitor();
     const GLFWvidmode *mode = glfwGetVideoMode(monitor);
 
+    static int old_w, old_h, old_x, old_y;
+
     if (!fullscreen) {
-        glfwGetWindowSize(ctx, &width, &height);
-        glfwGetWindowPos(ctx, &x, &y);
+        old_w = width;
+        old_h = height;
+        old_x = x;
+        old_y = y;
         glfwSetWindowMonitor(
             ctx, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
     } else {
-        glfwSetWindowMonitor(ctx, NULL, x, y, width, height, 0);
+        glfwSetWindowMonitor(ctx, NULL, old_x, old_y, old_w, old_h, 0);
     }
 
     fullscreen = !fullscreen;

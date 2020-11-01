@@ -3,50 +3,43 @@
 #include <stdexcept>
 #include <string>
 
+#include "../render/lighting.hxx"
+#include "../render/mesh.hxx"
+#include "../render/program.hxx"
 #include "../utils/logger.hxx"
-
-using namespace std::literals;
 
 namespace compleks {
 
+engine thread_local *engine::instance;
+
 engine::engine()
 {
-    if (!glfwInit()) {
-        throw std::runtime_error("Could not initialize engine");
+    if (instance) {
+        throw std::runtime_error("Only one window can be created per thread");
     }
-
-    glfwSetErrorCallback(glfw_error_func);
+    logger::info("Creating engine");
+    instance = this;
 }
 
 engine::~engine()
 {
-    glfwTerminate();
+    logger::info("Shutting down engine");
+    instance = nullptr;
 }
 
-void engine::enable_gl_logs()
+program &engine::get_program()
 {
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(gl_log_func, NULL);
+    return instance->prog;
 }
 
-void engine::glfw_error_func(int code, const char *msg)
+library<mesh> &engine::get_meshes()
 {
-    logger::error("GLFW error: "s + msg + " (" + std::to_string(code) + ")");
+    return instance->meshes;
 }
 
-void engine::gl_log_func(GLenum source, GLenum type, GLuint id, GLenum severity,
-    GLsizei length, const GLchar *message, const void *)
+lighting &engine::get_lighting()
 {
-    std::string log = "source " + std::to_string(source) + " type "
-        + std::to_string(type) + " id " + std::to_string(id) + " severity "
-        + std::to_string(severity) + ":\n"
-        + (length < 0 ? message : std::string(message, length));
-
-    if (type == GL_DEBUG_TYPE_ERROR) {
-        logger::error("GL error: " + log);
-    } else {
-        logger::info("GL log: " + log);
-    }
+    return instance->light;
 }
 
 }

@@ -5,8 +5,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "../core/engine.hxx"
 #include "../image/bayer.hxx"
-#include "../utils/logger.hxx"
 #include "../utils/resource.hxx"
 
 namespace compleks {
@@ -30,8 +30,10 @@ void lighting::remove_light(std::shared_ptr<light> l)
     lights.erase(std::remove(lights.begin(), lights.end(), l), lights.end());
 }
 
-void lighting::update(program &p, glm::vec3 eye)
+void lighting::update(glm::vec3 eye)
 {
+    program &p = engine::get_program();
+
     p.set("eye", eye);
     p.set("light_noise", noise_texture);
 

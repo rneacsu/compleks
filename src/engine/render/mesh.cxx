@@ -9,6 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <tiny_obj_loader.h>
 
+#include "../core/engine.hxx"
 #include "../utils/logger.hxx"
 
 namespace compleks {
@@ -164,8 +165,9 @@ mesh::~mesh()
     glDeleteVertexArrays(1, &vao);
 }
 
-void mesh::render(program &prog)
+void mesh::render()
 {
+    program &p = engine::get_program();
     glBindVertexArray(vao);
     for (auto &s : shapes) {
         material *m;
@@ -174,11 +176,11 @@ void mesh::render(program &prog)
         } else {
             m = &materials[s.material_idx];
         }
-        prog.set("material.diffuse", *m->diffuse);
-        prog.set("material.specular", *m->specular);
-        prog.set("material.ambient", *m->ambient);
-        prog.set("material.emissive", *m->emissive);
-        prog.set("material.shininess", m->shininess);
+        p.set("material.diffuse", *m->diffuse);
+        p.set("material.specular", *m->specular);
+        p.set("material.ambient", *m->ambient);
+        p.set("material.emissive", *m->emissive);
+        p.set("material.shininess", m->shininess);
 
         glDrawElements(GL_TRIANGLES, s.num_indices, GL_UNSIGNED_INT,
             (void *)((size_t)s.start_index * sizeof(indices[0])));

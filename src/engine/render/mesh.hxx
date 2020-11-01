@@ -1,12 +1,14 @@
 #ifndef __COMPLEKS_RENDER_MESH_HXX
 #define __COMPLEKS_RENDER_MESH_HXX
 
+#include <memory>
+#include <string>
 #include <vector>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
-#include "program.hxx"
+#include "texture.hxx"
 
 namespace compleks {
 
@@ -27,7 +29,7 @@ public:
     mesh(std::string path);
     ~mesh();
 
-    void render(program &);
+    void render();
 
 private:
     GLuint vao, vertices_buf, normals_buf, tex_coords_buf, indices_buf;
