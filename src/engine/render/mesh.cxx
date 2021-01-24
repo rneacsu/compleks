@@ -148,11 +148,13 @@ void mesh::create_buffers()
 void mesh::create_default_material(void)
 {
     default_material.diffuse
+        = std::make_unique<texture>(glm::vec3(0.8f, 0.8f, 0.8f));
+    default_material.specular
+        = std::make_unique<texture>(glm::vec3(0.5f, 0.5f, 0.5f) / 10.0f);
+    default_material.ambient
         = std::make_unique<texture>(glm::vec3(1.0f, 1.0f, 1.0f));
-    default_material.specular = std::make_unique<texture>();
-    default_material.ambient = std::make_unique<texture>();
     default_material.emissive = std::make_unique<texture>();
-    default_material.shininess = 30;
+    default_material.shininess = 324;
 }
 
 mesh::~mesh()
@@ -165,7 +167,7 @@ mesh::~mesh()
     glDeleteVertexArrays(1, &vao);
 }
 
-void mesh::render()
+void mesh::render(glm::vec3 tint)
 {
     program &p = engine::get_program();
     glBindVertexArray(vao);
@@ -181,6 +183,7 @@ void mesh::render()
         p.set("material.ambient", *m->ambient);
         p.set("material.emissive", *m->emissive);
         p.set("material.shininess", m->shininess);
+        p.set("material.tint", tint);
 
         glDrawElements(GL_TRIANGLES, s.num_indices, GL_UNSIGNED_INT,
             (void *)((size_t)s.start_index * sizeof(indices[0])));

@@ -56,6 +56,11 @@ std::shared_ptr<portal> portal::get_target(void)
     return target.lock();
 }
 
+std::vector<std::weak_ptr<portal>> &portal::get_sub_portals(void)
+{
+    return sub_portals;
+}
+
 bool portal::pass(camera &c)
 {
     auto t = target.lock();

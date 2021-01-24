@@ -14,11 +14,12 @@ public:
     glm::vec3 pos;
     glm::vec3 scale;
     glm::quat quat;
+    glm::vec3 color;
 
     object(std::string mesh_id);
 
     virtual void update(double delta);
-    void update_all(double delta);
+    virtual void update_all(double delta);
 
     void render(glm::mat4 transform = glm::mat4(1));
 
@@ -26,10 +27,10 @@ public:
     glm::mat4 get_view_matrix(void);
 
 protected:
+    std::string mesh_id;
     std::vector<object> children;
 
 private:
-    std::string mesh_id;
 };
 
 } // namespace compleks

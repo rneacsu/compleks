@@ -1,7 +1,5 @@
 #include "world.hxx"
 
-#include <iostream>
-
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -106,6 +104,10 @@ void world::render(double delta)
         return;
     }
 
+    if (!cursor_enabled) {
+        engine::get_physics().update(delta);
+    }
+
     camera.update(delta);
 
     for (auto &obj : objects) {
@@ -145,77 +147,89 @@ void world::render_objects(glm::mat4 view, glm::mat4 proj)
 void world::render_portals(glm::mat4 view, glm::mat4 proj, int depth,
     std::shared_ptr<portal> current_portal)
 {
-    for (auto &p : portals) {
+    std::vector<std::weak_ptr<portal>> visible_portals;
+
+    if (depth > 0 && current_portal) {
+        visible_portals = current_portal->get_sub_portals();
+    } else if (depth == 0) {
+        visible_portals.insert(
+            visible_portals.begin(), portals.begin(), portals.end());
+    }
+
+    glm::vec4 eye = glm::inverse(view) * glm::vec4(0, 0, 0, 1);
+
+    glEnable(GL_STENCIL_TEST);
+
+    for (auto &p_weak : visible_portals) {
+        auto p = p_weak.lock();
+
+        // Do not draw self
         if (p == current_portal) {
             continue;
         }
 
+        // Skip invisible portals
+        glm::vec3 normal = p->quat * glm::vec3(0, 0, 1);
+        if (glm::dot(normal, glm::vec3(eye) - p->pos) < 0) {
+            continue;
+        }
+
+        // Draw portal on stencil and increment
         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
-        glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
 
-        glEnable(GL_STENCIL_TEST);
-        glStencilFunc(GL_NOTEQUAL, depth, 0xFF);
-        glStencilOp(GL_INCR, GL_KEEP, GL_KEEP);
+        glStencilFunc(GL_EQUAL, depth, 0xFF);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
         glStencilMask(0xFF);
 
         set_transform(view, proj);
         p->render();
 
+        // Compute portal "camera" matrices
         glm::mat4 new_view = p->modify_view_matrix(view);
         glm::mat4 new_proj = p->modify_proj_matrix(view, proj);
 
+        // If maximum recursive depth is reached, draw scene normaly
         if (depth == max_portal_depth) {
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-            glEnable(GL_DEPTH_TEST);
             glDepthMask(GL_TRUE);
-            glClear(GL_DEPTH_BUFFER_BIT);
 
-            glEnable(GL_STENCIL_TEST);
             glStencilFunc(GL_EQUAL, depth + 1, 0xFF);
             glStencilMask(0x00);
 
             render_objects(new_view, new_proj);
         } else {
+            // Render portals recursively
             render_portals(new_view, new_proj, depth + 1, p->get_target());
         }
 
+        // Draw portal on stencil and decrement
+        // Also overwrite the depth buffer to avoid drawing objects behind
+        // the portal
         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-        glDepthMask(GL_FALSE);
 
-        glEnable(GL_STENCIL_TEST);
+        glDepthFunc(GL_ALWAYS);
+        glDepthMask(GL_TRUE);
+
+        glStencilFunc(GL_EQUAL, depth + 1, 0xFF);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
         glStencilMask(0xFF);
-        glStencilFunc(GL_NOTEQUAL, depth + 1, 0xFF);
-        glStencilOp(GL_DECR, GL_KEEP, GL_KEEP);
 
         set_transform(view, proj);
         p->render();
+
+        glDepthFunc(GL_LESS);
     }
 
-    glDisable(GL_STENCIL_TEST);
-    glStencilMask(0x00);
-
-    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
-    glDepthFunc(GL_ALWAYS);
-
-    glClear(GL_DEPTH_BUFFER_BIT);
-    set_transform(view, proj);
-    for (auto &p : portals)
-        p->render();
-
-    glDepthFunc(GL_LESS);
-
-    glEnable(GL_STENCIL_TEST);
-    glStencilMask(0x00);
-    glStencilFunc(GL_LEQUAL, depth, 0xFF);
-
+    // Draw the rest of the scene
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
     glDepthMask(GL_TRUE);
-    glEnable(GL_DEPTH_TEST);
+
+    glStencilFunc(GL_EQUAL, depth, 0xFF);
+    glStencilMask(0x00);
 
     render_objects(view, proj);
 }

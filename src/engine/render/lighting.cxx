@@ -30,6 +30,11 @@ void lighting::remove_light(std::shared_ptr<light> l)
     lights.erase(std::remove(lights.begin(), lights.end(), l), lights.end());
 }
 
+void lighting::clear()
+{
+    lights.clear();
+}
+
 void lighting::update(glm::vec3 eye)
 {
     program &p = engine::get_program();

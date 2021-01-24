@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 
+#include "../physics/body.hxx"
 #include "../window/input_listener.hxx"
 
 namespace compleks {
@@ -38,15 +39,16 @@ public:
 
 private:
     float yaw, pitch, roll, fov;
-    glm::vec3 pos, old_pos, front, up, right, velocity, acceleration;
+    glm::vec3 pos, old_pos, front, up, right;
     char walk_front, walk_right, elevate, tilt;
+    body body;
     bool sprint = false;
     bool enabled = false;
     float sensitivity = 0.005f;
     float max_speed = 3.0f;
     float sprint_multiplier = 2;
-    float drag_factor = 10;
     float eye_distance = 0.30f;
+    const float eye_height = 1.7f;
 };
 
 } // namespace compleks

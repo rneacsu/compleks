@@ -15,7 +15,7 @@ public:
     struct light {
         bool off = false;
         glm::vec3 pos = glm::vec3();
-        glm::vec3 ambient = glm::vec3(0.25f);
+        glm::vec3 ambient = glm::vec3(0.2f);
         glm::vec3 diffuse = glm::vec3(1);
         glm::vec3 specular = glm::vec3(1);
         glm::vec3 attenuation = glm::vec3(1, 0, 0);
@@ -28,6 +28,7 @@ public:
 
     void add_light(std::shared_ptr<light> l);
     void remove_light(std::shared_ptr<light> l);
+    void clear();
     void update(glm::vec3 eye);
 
 private:

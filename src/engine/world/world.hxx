@@ -6,9 +6,11 @@
 #include <vector>
 
 #include "../core/engine.hxx"
+#include "../physics/body.hxx"
 #include "camera.hxx"
 #include "object.hxx"
 #include "portal.hxx"
+#include "scene.hxx"
 
 namespace compleks {
 
@@ -22,6 +24,14 @@ public:
 
     void load_mesh(std::string id, std::string path);
 
+    template <class T> void load_scene(void)
+    {
+        static_assert(std::is_base_of<scene, T>::value);
+
+        current_scene = nullptr;
+        current_scene = std::make_unique<T>(*this);
+    }
+
     void render(double) override;
     void render_objects(glm::mat4 view, glm::mat4 proj);
     void render_portals(glm::mat4 view, glm::mat4 proj, int depth = 0,
@@ -30,15 +40,17 @@ public:
 
     void set_transform(glm::mat4 view, glm::mat4 proj);
 
-protected:
     std::vector<std::shared_ptr<object>> objects;
     std::vector<std::shared_ptr<portal>> portals;
     camera camera;
 
+protected:
 private:
     GLenum polygon_mode = GL_FILL;
-    int max_portal_depth = 4;
+    int max_portal_depth = 5;
     bool vr = false;
+
+    std::unique_ptr<scene> current_scene;
 };
 
 }

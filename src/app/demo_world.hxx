@@ -7,10 +7,10 @@ class demo_world : public compleks::world {
 public:
     demo_world();
 
+    void key_down(int, int) override;
+
 private:
-    std::shared_ptr<compleks::lighting::light> sun;
-    std::shared_ptr<compleks::object> plane, cube;
-    std::shared_ptr<compleks::portal> p1, p2;
+    int current_scene_num;
 };
 
 #endif // __DEMO_WORLD_HXX

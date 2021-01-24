@@ -3,8 +3,8 @@
 
 #include <compleks.h>
 
+#include "demo_world.hxx"
 #include "resource.h"
-#include "worlds/demo_world.hxx"
 
 using namespace std::literals;
 

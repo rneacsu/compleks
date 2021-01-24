@@ -17,10 +17,12 @@ public:
     glm::mat4 modify_proj_matrix(glm::mat4 view, glm::mat4 proj);
     void set_target(std::shared_ptr<portal> p);
     std::shared_ptr<portal> get_target(void);
+    std::vector<std::weak_ptr<portal>> &get_sub_portals(void);
     bool pass(camera &c);
 
 private:
     std::weak_ptr<portal> target;
+    std::vector<std::weak_ptr<portal>> sub_portals;
 };
 
 } // namespace compleks

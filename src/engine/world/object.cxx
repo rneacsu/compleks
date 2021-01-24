@@ -12,6 +12,7 @@ object::object(std::string mesh_id)
     pos = { 0, 0, 0 };
     scale = { 1, 1, 1 };
     quat = glm::quat(glm::vec3(0, 0, 0));
+    color = { 1, 1, 1 };
 }
 
 glm::mat4 object::get_model_matrix(void)
@@ -31,7 +32,7 @@ void object::render(glm::mat4 transform)
     engine::get_program().set("model_matrix", transform);
 
     if (!mesh_id.empty()) {
-        engine::get_meshes().get(mesh_id).render();
+        engine::get_meshes().get(mesh_id).render(color);
     }
 
     for (auto &child : children) {

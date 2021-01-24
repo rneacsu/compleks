@@ -13,7 +13,14 @@ using namespace std::literals;
 namespace compleks {
 
 camera::camera()
+    : body("")
 {
+    body.mass = 80;
+    body.create_body(std::make_shared<shape>(std::make_unique<btCapsuleShape>(
+                         0.3f, eye_height - 0.6f)),
+        false);
+
+    body.rigid_body->setActivationState(DISABLE_DEACTIVATION);
     reset();
 }
 
@@ -25,21 +32,29 @@ void camera::update(double delta)
 
     old_pos = pos;
 
-    if (walk_front || walk_right || elevate) {
+    glm::vec3 acceleration;
+
+    glm::vec3 velocity = body.get_velocity();
+    velocity.y = 0;
+    float speed = glm::length(velocity);
+    float top_speed = max_speed * (sprint ? sprint_multiplier : 1.0f);
+    if (top_speed - speed > 0 && (walk_front || walk_right)) {
         acceleration
             = glm::normalize(glm::vec3(front.x, 0, front.z)) * (float)walk_front
-            + glm::normalize(glm::vec3(right.x, 0, right.z)) * (float)walk_right
-            + glm::vec3(0, 1, 0) * (float)elevate;
-        acceleration = glm::normalize(acceleration)
-            * (sprint ? sprint_multiplier : 1.0f);
+            + glm::normalize(glm::vec3(right.x, 0, right.z))
+                * (float)walk_right;
+        acceleration = glm::normalize(acceleration);
+
+        acceleration *= 40.0f;
     } else {
-        acceleration = glm::vec3();
+        acceleration = -velocity * 10.0f;
     }
 
-    velocity
-        += (acceleration * drag_factor * max_speed - velocity * drag_factor)
-        * (float)delta;
-    pos += velocity * (float)delta;
+    btVector3 acc(acceleration.x, acceleration.y, acceleration.z);
+    body.rigid_body->applyCentralForce(acc * body.mass);
+
+    body.update_all(delta);
+    pos = body.pos + glm::vec3(0, eye_height / 2, 0);
 
     if (tilt) {
         roll += tilt * (float)delta;
@@ -75,16 +90,18 @@ glm::vec3 camera::get_position()
 void camera::set_position(glm::vec3 p)
 {
     pos = old_pos = p;
+
+    body.set_position(pos - glm::vec3(0, eye_height / 2, 0));
 }
 
 glm::vec3 camera::get_velocity()
 {
-    return velocity;
+    return body.get_velocity();
 }
 
 void camera::set_velocity(glm::vec3 v)
 {
-    velocity = v;
+    body.set_velocity(v);
 }
 
 void camera::set_orientation(glm::vec3 euler)
@@ -127,6 +144,7 @@ void camera::key_down(int key, int)
         tilt += 1;
         break;
     case GLFW_KEY_SPACE:
+        body.rigid_body->applyCentralImpulse(btVector3(0.0f, 350.0f, 0.0f));
         elevate += 1;
         break;
     case GLFW_KEY_LEFT_SHIFT:
@@ -202,15 +220,19 @@ void camera::mouse_scroll(float delta)
 
 void camera::reset()
 {
-    pos = { 1.5, 2, 1.5 };
+    pos = { 1.5, eye_height, 1.5 };
     up = { 0, 1, 0 };
     yaw = glm::radians(-135.0f);
     pitch = glm::radians(-30.0f);
     roll = 0;
     fov = glm::radians(60.0f);
     walk_front = walk_right = elevate = tilt = 0;
-    acceleration = velocity = glm::vec3();
     sprint = false;
+
+    set_position(pos);
+    set_velocity({ 0, 0, 0 });
+    body.rigid_body->clearForces();
+
     mouse_move(0.0f, 0.0f);
 }
 

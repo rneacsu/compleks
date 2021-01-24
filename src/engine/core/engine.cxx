@@ -42,4 +42,9 @@ lighting &engine::get_lighting()
     return instance->light;
 }
 
+physics &engine::get_physics()
+{
+    return instance->phys;
+}
+
 }

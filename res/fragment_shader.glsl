@@ -19,6 +19,7 @@ struct material_t {
     sampler2D ambient;
     sampler2D emissive;
     float shininess;
+    vec3 tint;
 };
 
 uniform light_t lights[MAX_LIGHTS];
@@ -66,10 +67,12 @@ vec3 add_light(vec3 color)
 
             color += vec3(texture(material.emissive, f_tex_coord));
             color += vec3(texture(material.ambient, f_tex_coord))
+                * material.tint
                 * lights[i].ambient;
 
             if (dot(N, L) > 0) {
                 color += vec3(texture(material.diffuse, f_tex_coord))
+                    * material.tint
                     * lights[i].diffuse
                     * dot(N, L)
                     * attenuation;

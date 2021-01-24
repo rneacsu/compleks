@@ -29,7 +29,7 @@ public:
     mesh(std::string path);
     ~mesh();
 
-    void render();
+    void render(glm::vec3 tint = glm::vec3(1));
 
 private:
     GLuint vao, vertices_buf, normals_buf, tex_coords_buf, indices_buf;

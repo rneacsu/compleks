@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "../physics/physics.hxx"
 #include "../render/lighting.hxx"
 #include "../render/mesh.hxx"
 #include "../render/program.hxx"
@@ -14,18 +15,20 @@ namespace compleks {
 
 class engine : public context {
 public:
-    library<mesh> meshes;
-    program prog;
-    lighting light;
-
     engine();
     ~engine();
 
     static program &get_program(void);
     static library<mesh> &get_meshes(void);
     static lighting &get_lighting(void);
+    static physics &get_physics(void);
 
 private:
+    library<mesh> meshes;
+    program prog;
+    lighting light;
+    physics phys;
+
     static thread_local engine *instance;
 };
 
