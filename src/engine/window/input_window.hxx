@@ -18,7 +18,6 @@ public:
     void remove_listener(input_listener *);
     void set_cursor(bool enabled);
 
-protected:
     bool cursor_enabled = true;
 
 private:

@@ -36,6 +36,7 @@ void body::create_body(std::shared_ptr<shape> s, bool inertia)
         mass, motion_state.get(), collision_shape->get_shape(), local_inertia);
 
     rigid_body = std::make_unique<btRigidBody>(ci);
+    rigid_body->setUserPointer(this);
 
     engine::get_physics().get_dynamics_world().addRigidBody(rigid_body.get());
 }

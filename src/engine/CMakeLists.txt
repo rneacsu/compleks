@@ -1,7 +1,4 @@
-include_directories(
-    ${GLEW_INCLUDE_DIRS} ${STB_INCLUDE_DIRS}
-    ${BULLET_INCLUDE_DIRS}
-)
+include_directories(${STB_INCLUDE_DIRS})
 
 add_subdirectory(window)
 add_subdirectory(core)
@@ -26,6 +23,6 @@ target_link_libraries(compleks
 target_link_libraries(compleks
     GLEW::GLEW
     glfw
-    glm
     tinyobjloader::tinyobjloader
-    LinearMath Bullet3Common BulletCollision BulletDynamics)
+    LinearMath Bullet3Common BulletCollision BulletDynamics
+)

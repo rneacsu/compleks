@@ -26,7 +26,6 @@ world::world()
 
 void world::key_down(int key, int mods)
 {
-    input_window::key_down(key, mods);
     switch (key) {
     case GLFW_KEY_ESCAPE:
         if (cursor_enabled) {
@@ -120,11 +119,17 @@ void world::render(double delta)
         }
     }
 
+    if (current_scene) {
+        current_scene->update(delta);
+    }
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, w, h);
+
     glm::mat4 view, proj;
     view = camera.get_view_matrix();
     proj = camera.get_projection_matrix(w, h);
+
     if (!vr) {
         render_portals(view, proj);
     } else {

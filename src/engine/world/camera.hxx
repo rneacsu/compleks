@@ -29,6 +29,8 @@ public:
     glm::vec3 get_velocity();
     void set_velocity(glm::vec3 v);
 
+    glm::vec3 get_front();
+
     void set_enabled(bool);
     void reset();
 

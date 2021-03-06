@@ -17,7 +17,7 @@ camera::camera()
 {
     body.mass = 80;
     body.create_body(std::make_shared<shape>(std::make_unique<btCapsuleShape>(
-                         0.3f, eye_height - 0.6f)),
+                         0.3f, eye_height - 0.5f)),
         false);
 
     body.rigid_body->setActivationState(DISABLE_DEACTIVATION);
@@ -148,10 +148,9 @@ void camera::key_down(int key, int)
         elevate += 1;
         break;
     case GLFW_KEY_LEFT_SHIFT:
-        elevate -= 1;
-        break;
     case GLFW_KEY_RIGHT_SHIFT:
         sprint = true;
+        elevate -= 1;
         break;
     case GLFW_KEY_R:
         reset();
@@ -183,10 +182,9 @@ void camera::key_up(int key, int)
         elevate -= 1;
         break;
     case GLFW_KEY_LEFT_SHIFT:
-        elevate += 1;
-        break;
     case GLFW_KEY_RIGHT_SHIFT:
         sprint = false;
+        elevate += 1;
         break;
     }
 }
@@ -239,6 +237,11 @@ void camera::reset()
 glm::vec3 camera::get_old_position(void)
 {
     return old_pos;
+}
+
+glm::vec3 camera::get_front(void)
+{
+    return front;
 }
 
 } // namespace compleks

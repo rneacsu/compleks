@@ -25,7 +25,7 @@ void input_window::add_listener(input_listener *l)
     if (listeners.find(ctx) == listeners.end()) {
         listeners[ctx] = std::make_pair(this, std::list<input_listener *>());
     }
-    listeners[ctx].second.push_front(l);
+    listeners[ctx].second.push_back(l);
 }
 
 void input_window::remove_listener(input_listener *l)
