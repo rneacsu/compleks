@@ -3,16 +3,10 @@
 
 extern int main(int argc, char *argv[]);
 
-int WinMain(
-    HINSTANCE hInstance,
-    HINSTANCE hPrevInstance,
-    LPSTR lpCmdLine,
-    int nShowCmd
-) {
+int WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
+{
     int argc;
     WCHAR **argv;
-
-    hInstance, hPrevInstance, lpCmdLine, nShowCmd;
 
     argv = CommandLineToArgvW(GetCommandLineW(), &argc);
 
@@ -25,9 +19,8 @@ int WinMain(
     for (int i = 0; i < argc; i++) {
         int j = 0;
         do {
-            ((char *)argv[i])[j] = (char) argv[i][j];
+            ((char *)argv[i])[j] = (char)argv[i][j];
         } while (argv[i][j++]);
-
     }
 
     return main(argc, (char **)argv);

@@ -8,7 +8,7 @@ namespace compleks {
 
 context::context()
 {
-    logger::info("Initializing context");
+    logger::info("Creating OpenGL context");
 
     glfwMakeContextCurrent(ctx);
     glfwSwapInterval(1);
@@ -20,16 +20,29 @@ context::context()
 
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(gl_log_func, NULL);
+    logger::info(
+        "OpenGL version: "
+        + std::string((const char *)glGetString(GL_VERSION)));
+    logger::info("GPU: " + std::string((const char *)glGetString(GL_RENDERER)));
 }
 
 context::~context()
 {
-    logger::info("Destroying context");
+    logger::info("Destroying OpenGL context");
 }
 
-void context::gl_log_func(GLenum source, GLenum type, GLuint id,
-    GLenum severity, GLsizei length, const GLchar *message, const void *)
+void context::gl_log_func(
+    GLenum source,
+    GLenum type,
+    GLuint id,
+    GLenum severity,
+    GLsizei length,
+    const GLchar *message,
+    const void *)
 {
+    if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) {
+        return;
+    }
     std::string log = "source " + std::to_string(source) + " type "
         + std::to_string(type) + " id " + std::to_string(id) + " severity "
         + std::to_string(severity) + ":\n"

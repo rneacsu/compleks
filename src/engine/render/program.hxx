@@ -18,13 +18,13 @@ public:
     program();
     ~program();
 
-    void update_shaders(std::unique_ptr<resource> v_shader_src = nullptr,
-        std::unique_ptr<resource> f_shader_src = nullptr);
+    bool reload(void);
 
     void set(std::string var, int value);
     void set(std::string var, unsigned int value);
     void set(std::string var, float value);
     void set(std::string var, glm::vec3 value);
+    void set(std::string var, glm::vec4 value);
     void set(std::string var, glm::mat4 value);
     void set(std::string var, texture &tex);
 
@@ -34,6 +34,7 @@ private:
     shader vertex_shader, fragment_shader;
     std::map<std::string, unsigned char> textures_map;
 
+    bool link(void);
     GLint get_location(std::string var);
 };
 

@@ -6,8 +6,6 @@
 
 #include "../utils/logger.hxx"
 
-using namespace std::literals;
-
 namespace compleks {
 
 shader::shader(type t)
@@ -17,15 +15,7 @@ shader::shader(type t)
 
 bool shader::compile(std::unique_ptr<resource> source)
 {
-    if (source) {
-        src = std::move(source);
-    } else if (src) {
-        src->reload();
-    } else {
-        logger::warn("Could not compile shader: no source provided");
-
-        return false;
-    }
+    src = std::move(source);
 
     glShaderSource(id, 1, (char **)&src->ptr, (int *)&src->size);
     glCompileShader(id);
@@ -37,10 +27,17 @@ bool shader::compile(std::unique_ptr<resource> source)
         auto log = std::make_unique<char[]>(length);
         glGetShaderInfoLog(id, length, NULL, log.get());
 
-        logger::error("Shader compile error:\n"s + log.get());
+        logger::error(std::string("Shader compile error:\n") + log.get());
     }
 
     return status;
+}
+
+bool shader::reload()
+{
+    src->reload();
+
+    return compile(std::move(src));
 }
 
 shader::~shader()

@@ -13,7 +13,6 @@ public:
     enum mode { NEAREST, LINEAR };
 
     texture(const image &img, mode m = mode::LINEAR);
-    texture(glm::vec3 color = glm::vec3());
     ~texture();
 
     void bind();

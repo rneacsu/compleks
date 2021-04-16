@@ -18,10 +18,11 @@ public:
     void remove_listener(input_listener *);
     void set_cursor(bool enabled);
 
-    bool cursor_enabled = true;
+    bool focused = false;
 
 private:
-    static std::map<GLFWwindow *,
+    static std::map<
+        GLFWwindow *,
         std::pair<input_window *, std::list<input_listener *>>>
         listeners;
     static void key_callback(GLFWwindow *, int, int, int, int);

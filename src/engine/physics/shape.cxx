@@ -13,12 +13,12 @@ shape::shape(std::unique_ptr<btCollisionShape> s)
 
 void shape::set_shape(std::unique_ptr<btCollisionShape> s)
 {
-    collision_shape = std::move(s);
+    bt_shape = std::move(s);
 }
 
-btCollisionShape *shape::get_shape(void)
+btCollisionShape &shape::get_shape(void)
 {
-    return collision_shape.get();
+    return *bt_shape;
 }
 
 } // namespace compleks

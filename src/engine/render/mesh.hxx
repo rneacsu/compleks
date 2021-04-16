@@ -15,7 +15,9 @@ namespace compleks {
 class mesh {
 
     struct material {
-        std::unique_ptr<texture> diffuse, specular, ambient, emissive;
+        std::shared_ptr<texture> diffuse_tex, specular_tex, ambient_tex,
+            emissive_tex;
+        glm::vec3 diffuse_color, specular_color, ambient_color, emissive_color;
         float shininess;
     };
 
@@ -27,9 +29,14 @@ class mesh {
 
 public:
     mesh(std::string path);
+    mesh(
+        std::vector<glm::vec3> v,
+        std::vector<glm::vec3> n,
+        std::vector<glm::vec2> t,
+        std::vector<unsigned int> i);
     ~mesh();
 
-    void render(glm::vec3 tint = glm::vec3(1));
+    void render(glm::vec4 color = glm::vec4(1));
 
 private:
     GLuint vao, vertices_buf, normals_buf, tex_coords_buf, indices_buf;

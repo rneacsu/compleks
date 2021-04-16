@@ -1,5 +1,3 @@
-include_directories(${STB_INCLUDE_DIRS})
-
 add_subdirectory(window)
 add_subdirectory(core)
 add_subdirectory(utils)

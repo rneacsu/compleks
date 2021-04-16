@@ -1,6 +1,7 @@
 #ifndef __COMPLEKS_WORLD_OBJECT_HXX
 #define __COMPLEKS_WORLD_OBJECT_HXX
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -14,21 +15,17 @@ public:
     glm::vec3 pos;
     glm::vec3 scale;
     glm::quat quat;
-    glm::vec3 color;
+    glm::vec4 color;
 
-    object(std::string mesh_id);
+    object(std::string id);
 
     virtual void update(double delta);
-    virtual void update_all(double delta);
-
     void render(glm::mat4 transform = glm::mat4(1));
-
     glm::mat4 get_model_matrix(void);
     glm::mat4 get_view_matrix(void);
 
 protected:
-    std::string mesh_id;
-    std::vector<object> children;
+    std::string id;
 
 private:
 };

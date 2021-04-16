@@ -1,11 +1,8 @@
 #include "scene4.hxx"
 
-#include "../shapes/gate_shape.hxx"
+#include "../shapes/shapes.hxx"
 
-#include <iostream>
-
-scene4::scene4(compleks::world &world)
-    : scene(world)
+scene4::scene4()
 {
     sun = std::make_shared<compleks::lighting::light>();
     sun->pos = glm::vec3(40, 50, 40) * 20.0f;
@@ -15,86 +12,72 @@ scene4::scene4(compleks::world &world)
 
     glClearColor(135 / 255.0f, 206 / 255.0f, 235 / 255.0f, 1.0f);
 
-    std::shared_ptr<compleks::shape> shape;
-
     plane = std::make_shared<compleks::body>("quad");
     plane->pos = { 0, 0, 0 };
     plane->scale = { 50, 50, 1 };
     plane->quat = glm::quat({ glm::radians(-90.0f), 0.0f, 0.0f });
-    plane->color = { 151 / 255.0f, 255 / 255.0f, 99 / 255.0f };
-    shape = std::make_shared<compleks::shape>(
-        std::make_unique<btBoxShape>(btVector3(25.0f, 25.0f, 0.01f)));
-    plane->create_body(shape);
+    plane->color = { 151 / 255.0f, 255 / 255.0f, 99 / 255.0f, 1 };
+    plane->create_body(std::make_unique<plane_shape>());
 
-    world.objects.push_back(plane);
+    world.static_objects.push_back(plane);
 
     // Room 1
-    cube1 = std::make_shared<compleks::body>("cube");
+    cube1 = std::make_shared<compleks::body>("cube", 10.0f);
     cube1->pos = { 0, 0.5, -2 };
-    cube1->color = { 1.0, 0.5, 0.5 };
-    cube1->mass = 10;
-    shape = std::make_shared<compleks::shape>(
-        std::make_unique<btBoxShape>(btVector3(0.5f, 0.5f, 0.5f)));
-    cube1->create_body(shape);
+    cube1->color = { 1.0, 0.5, 0.5, 1 };
+    cube1->create_body(std::make_unique<cube_shape>());
 
     gate11 = std::make_shared<compleks::body>("gate");
     gate11->pos = { 0, 0, 0 };
     gate11->scale = { 4, 1.5, 32 };
-    gate11->color = { 107 / 255.0f, 184 / 255.0f, 255 / 255.0f };
-    gate11->create_body(std::make_shared<gate_shape>(4.0f, 3.0f, 8.0f));
+    gate11->color = { 107 / 255.0f, 184 / 255.0f, 255 / 255.0f, 1 };
+    gate11->create_body(std::make_unique<gate_shape>());
 
     gate12 = std::make_shared<compleks::body>("gate");
     gate12->pos = { 0, 0, 0 };
     gate12->scale = { 8, 1.5, 16 };
-    gate12->color = { 107 / 255.0f, 184 / 255.0f, 255 / 255.0f };
+    gate12->color = { 107 / 255.0f, 184 / 255.0f, 255 / 255.0f, 1 };
     gate12->quat = glm::quat({ 0.0f, glm::radians(90.0f), 0.0f });
-    gate12->create_body(std::make_shared<gate_shape>(8.0f, 3.0f, 4.0f));
+    gate12->create_body(std::make_unique<gate_shape>());
 
     pillar1 = std::make_shared<compleks::body>("cube");
     pillar1->pos = { 0, 1.5, 1.875 };
     pillar1->scale = { 0.25, 3, 0.25 };
-    shape = std::make_shared<compleks::shape>(
-        std::make_unique<btBoxShape>(btVector3(0.125f, 1.5f, 0.125f)));
-    pillar1->create_body(shape);
+    pillar1->create_body(std::make_unique<cube_shape>());
 
-    world.objects.push_back(cube1);
-    world.objects.push_back(gate11);
-    world.objects.push_back(gate12);
-    world.objects.push_back(pillar1);
+    world.dynamic_objects.push_back(cube1);
+    world.static_objects.push_back(gate11);
+    world.static_objects.push_back(gate12);
+    world.static_objects.push_back(pillar1);
 
     // Room 2
-    cube2 = std::make_shared<compleks::body>("cube");
+    cube2 = std::make_shared<compleks::body>("cube", 10.0f);
     cube2->pos = { 10, 0.5, -2 };
-    cube2->color = { 0.5, 0.5, 1 };
-    cube2->mass = 10;
-    shape = std::make_shared<compleks::shape>(
-        std::make_unique<btBoxShape>(btVector3(0.5f, 0.5f, 0.5f)));
-    cube2->create_body(shape);
+    cube2->color = { 0.5, 0.5, 1, 1 };
+    cube2->create_body(std::make_unique<cube_shape>());
 
     gate21 = std::make_shared<compleks::body>("gate");
     gate21->pos = { 10, 0, 0 };
     gate21->scale = { 4, 1.5, 32 };
-    gate21->color = { 107 / 255.0f, 184 / 255.0f, 255 / 255.0f };
-    gate21->create_body(std::make_shared<gate_shape>(4.0f, 3.0f, 8.0f));
+    gate21->color = { 107 / 255.0f, 184 / 255.0f, 255 / 255.0f, 1 };
+    gate21->create_body(std::make_unique<gate_shape>());
 
     gate22 = std::make_shared<compleks::body>("gate");
     gate22->pos = { 10, 0, 0 };
     gate22->scale = { 8, 1.5, 16 };
-    gate22->color = { 107 / 255.0f, 184 / 255.0f, 255 / 255.0f };
+    gate22->color = { 107 / 255.0f, 184 / 255.0f, 255 / 255.0f, 1 };
     gate22->quat = glm::quat({ 0.0f, glm::radians(90.0f), 0.0f });
-    gate22->create_body(std::make_shared<gate_shape>(8.0f, 3.0f, 4.0f));
+    gate22->create_body(std::make_unique<gate_shape>());
 
     pillar2 = std::make_shared<compleks::body>("cube");
     pillar2->pos = { 10, 1.5, 1.875 };
     pillar2->scale = { 0.25, 3, 0.25 };
-    shape = std::make_shared<compleks::shape>(
-        std::make_unique<btBoxShape>(btVector3(0.125f, 1.5f, 0.125f)));
-    pillar2->create_body(shape);
+    pillar2->create_body(std::make_unique<cube_shape>());
 
-    world.objects.push_back(cube2);
-    world.objects.push_back(gate21);
-    world.objects.push_back(gate22);
-    world.objects.push_back(pillar2);
+    world.dynamic_objects.push_back(cube2);
+    world.static_objects.push_back(gate21);
+    world.static_objects.push_back(gate22);
+    world.static_objects.push_back(pillar2);
 
     p1 = std::make_shared<compleks::portal>();
     p2 = std::make_shared<compleks::portal>();

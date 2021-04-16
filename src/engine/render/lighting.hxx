@@ -30,6 +30,7 @@ public:
     void remove_light(std::shared_ptr<light> l);
     void clear();
     void update(glm::vec3 eye);
+    void disable();
 
 private:
     const unsigned int MAX_LIGHTS = 5;

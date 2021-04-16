@@ -14,10 +14,12 @@ namespace compleks {
 lighting::lighting()
     : noise_texture(bayer(), texture::mode::NEAREST)
 {
+    logger::info("Creating lighting");
 }
 
 lighting::~lighting()
 {
+    logger::info("Destroying lighting");
 }
 
 void lighting::add_light(std::shared_ptr<light> l)
@@ -39,6 +41,7 @@ void lighting::update(glm::vec3 eye)
 {
     program &p = engine::get_program();
 
+    engine::get_program().set("light_on", true);
     p.set("eye", eye);
     p.set("light_noise", noise_texture);
 
@@ -59,7 +62,7 @@ void lighting::update(glm::vec3 eye)
 
         std::string prefix = "lights[" + std::to_string(i++) + "].";
 
-        p.set(prefix + "off", 0);
+        p.set(prefix + "on", 1);
         p.set(prefix + "pos", l->pos);
         p.set(prefix + "ambient", l->ambient);
         p.set(prefix + "diffuse", l->diffuse);
@@ -72,8 +75,13 @@ void lighting::update(glm::vec3 eye)
     for (; i < MAX_LIGHTS; i++) {
         std::string prefix = "lights[" + std::to_string(i) + "].";
 
-        p.set(prefix + "off", 1);
+        p.set(prefix + "on", 0);
     }
+}
+
+void lighting::disable()
+{
+    engine::get_program().set("light_on", false);
 }
 
 } // namespace compleks

@@ -5,3 +5,8 @@ ColumnLimit: 80
 AllowShortBlocksOnASingleLine: Never
 AllowShortFunctionsOnASingleLine: None
 PointerAlignment: Right
+BinPackArguments: false
+BinPackParameters: false
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AlignAfterOpenBracket: AlwaysBreak

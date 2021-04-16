@@ -1,16 +1,12 @@
 configure_file(main.rc.in main.rc)
 
+add_subdirectory(scenes)
+add_subdirectory(shapes)
+
 add_executable(main
     main.cpp
     bootstrap.cxx
-    demo_world.cxx
-    scenes/scene1.cxx
-    scenes/scene2.cxx
-    scenes/scene3.cxx
-    scenes/scene4.cxx
-    scenes/scene5.cxx
-    scenes/scene6.cxx
-    shapes/gate_shape.cxx
+    demo.cxx
     ${CMAKE_CURRENT_BINARY_DIR}/main.rc)
 
-target_link_libraries(main compleks)
+target_link_libraries(main app_shapes app_scenes compleks)

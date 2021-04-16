@@ -10,13 +10,12 @@
 #include <tiny_obj_loader.h>
 
 #include "../core/engine.hxx"
-#include "../utils/logger.hxx"
 
 namespace compleks {
 
 mesh::mesh(std::string path)
 {
-    logger::info("Importing mesh " + path);
+    logger::info("Loading mesh " + path);
 
     tinyobj::ObjReader reader;
     bool ret = reader.ParseFromFile(path);
@@ -35,29 +34,24 @@ mesh::mesh(std::string path)
     }
 
     tinyobj::attrib_t attr = reader.GetAttrib();
-    unsigned int num_vertices = 0;
-    bool create_def_mat = false;
+    unsigned int num_indices = 0;
+
     for (auto &shape : reader.GetShapes()) {
         struct shape s;
 
         s.material_idx = shape.mesh.material_ids[0];
-        if (s.material_idx < 0) {
-            create_def_mat = true;
-        }
-        s.start_index = num_vertices;
+        s.start_index = num_indices;
 
         for (auto idx : shape.mesh.indices) {
-            vertices.push_back({ attr.vertices[3 * idx.vertex_index + 0],
-                attr.vertices[3 * idx.vertex_index + 1],
-                attr.vertices[3 * idx.vertex_index + 2] });
-            normals.push_back({ attr.normals[3 * idx.normal_index + 0],
-                attr.normals[3 * idx.normal_index + 1],
-                attr.normals[3 * idx.normal_index + 2] });
-            tex_coords.push_back({ attr.texcoords[2 * idx.texcoord_index + 0],
-                attr.texcoords[2 * idx.texcoord_index + 1] });
-            indices.push_back(num_vertices++);
+            vertices.push_back(
+                glm::make_vec3(attr.vertices.data() + 3 * idx.vertex_index));
+            normals.push_back(
+                glm::make_vec3(attr.normals.data() + 3 * idx.normal_index));
+            tex_coords.push_back(
+                glm::make_vec2(attr.texcoords.data() + 2 * idx.texcoord_index));
+            indices.push_back(num_indices++);
         }
-        s.num_indices = num_vertices - s.start_index;
+        s.num_indices = num_indices - s.start_index;
         shapes.push_back(s);
     }
 
@@ -67,37 +61,30 @@ mesh::mesh(std::string path)
         material mat;
 
         if (!m.diffuse_texname.empty()) {
-            mat.diffuse = std::make_unique<texture>(
+            mat.diffuse_tex = std::make_shared<texture>(
                 image(resource(dir + m.diffuse_texname)));
-        } else {
-            mat.diffuse = std::make_unique<texture>(glm::make_vec3(m.diffuse));
         }
+        mat.diffuse_color = glm::make_vec3(m.diffuse);
 
         if (!m.specular_texname.empty()) {
-            mat.specular = std::make_unique<texture>(
+            mat.specular_tex = std::make_shared<texture>(
                 image(resource(dir + m.specular_texname)));
-        } else {
-            mat.specular
-                = std::make_unique<texture>(glm::make_vec3(m.specular));
         }
+        mat.specular_color = glm::make_vec3(m.specular);
 
         if (!m.ambient_texname.empty()) {
-            mat.ambient = std::make_unique<texture>(
+            mat.ambient_tex = std::make_shared<texture>(
                 image(resource(dir + m.ambient_texname)));
-        } else if (!m.diffuse_texname.empty()) {
-            mat.ambient = std::make_unique<texture>(
-                image(resource(dir + m.diffuse_texname)));
-        } else {
-            mat.ambient = std::make_unique<texture>(glm::make_vec3(m.ambient));
+        } else if (mat.diffuse_tex) {
+            mat.ambient_tex = mat.diffuse_tex;
         }
+        mat.ambient_color = glm::make_vec3(m.ambient);
 
         if (!m.emissive_texname.empty()) {
-            mat.emissive = std::make_unique<texture>(
+            mat.emissive_tex = std::make_shared<texture>(
                 image(resource(dir + m.emissive_texname)));
-        } else {
-            mat.emissive
-                = std::make_unique<texture>(glm::make_vec3(m.emission));
         }
+        mat.emissive_color = glm::make_vec3(m.emission);
 
         mat.shininess = m.shininess;
 
@@ -105,10 +92,30 @@ mesh::mesh(std::string path)
     }
 
     create_buffers();
+    create_default_material();
+}
 
-    if (create_def_mat) {
-        create_default_material();
-    }
+mesh::mesh(
+    std::vector<glm::vec3> v,
+    std::vector<glm::vec3> n,
+    std::vector<glm::vec2> t,
+    std::vector<unsigned int> i)
+    : vertices(v)
+    , normals(n)
+    , tex_coords(t)
+    , indices(i)
+{
+    logger::info("Creating primitive mesh");
+
+    struct shape s;
+
+    s.material_idx = -1;
+    s.start_index = 0;
+    s.num_indices = (unsigned int)indices.size();
+    shapes.push_back(s);
+
+    create_buffers();
+    create_default_material();
 }
 
 void mesh::create_buffers()
@@ -118,48 +125,57 @@ void mesh::create_buffers()
 
     glGenBuffers(1, &vertices_buf);
     glBindBuffer(GL_ARRAY_BUFFER, vertices_buf);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * vertices.size(),
-        vertices.data(), GL_STATIC_DRAW);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        sizeof(vertices[0]) * vertices.size(),
+        vertices.data(),
+        GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     glGenBuffers(1, &normals_buf);
     glBindBuffer(GL_ARRAY_BUFFER, normals_buf);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(normals[0]) * normals.size(),
-        normals.data(), GL_STATIC_DRAW);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        sizeof(normals[0]) * normals.size(),
+        normals.data(),
+        GL_STATIC_DRAW);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     glGenBuffers(1, &tex_coords_buf);
     glBindBuffer(GL_ARRAY_BUFFER, tex_coords_buf);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(tex_coords[0]) * tex_coords.size(),
-        tex_coords.data(), GL_STATIC_DRAW);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        sizeof(tex_coords[0]) * tex_coords.size(),
+        tex_coords.data(),
+        GL_STATIC_DRAW);
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     glGenBuffers(1, &indices_buf);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_buf);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(),
-        indices.data(), GL_STATIC_DRAW);
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,
+        sizeof(indices[0]) * indices.size(),
+        indices.data(),
+        GL_STATIC_DRAW);
 
     glBindVertexArray(0);
 }
 
 void mesh::create_default_material(void)
 {
-    default_material.diffuse
-        = std::make_unique<texture>(glm::vec3(0.8f, 0.8f, 0.8f));
-    default_material.specular
-        = std::make_unique<texture>(glm::vec3(0.5f, 0.5f, 0.5f) / 10.0f);
-    default_material.ambient
-        = std::make_unique<texture>(glm::vec3(1.0f, 1.0f, 1.0f));
-    default_material.emissive = std::make_unique<texture>();
+    default_material.diffuse_color = glm::vec3(0.8f, 0.8f, 0.8f);
+    default_material.specular_color = glm::vec3(0.05f, 0.05f, 0.05f);
+    default_material.ambient_color = glm::vec3(1.0f, 1.0f, 1.0f);
+    default_material.emissive_color = glm::vec3(0.0f, 0.0f, 0.0f);
     default_material.shininess = 324;
 }
 
 mesh::~mesh()
 {
-    logger::info("Releasing mesh");
+    logger::info("Destroying mesh");
     glDeleteBuffers(1, &vertices_buf);
     glDeleteBuffers(1, &normals_buf);
     glDeleteBuffers(1, &tex_coords_buf);
@@ -167,9 +183,10 @@ mesh::~mesh()
     glDeleteVertexArrays(1, &vao);
 }
 
-void mesh::render(glm::vec3 tint)
+void mesh::render(glm::vec4 color)
 {
     program &p = engine::get_program();
+
     glBindVertexArray(vao);
     for (auto &s : shapes) {
         material *m;
@@ -178,16 +195,50 @@ void mesh::render(glm::vec3 tint)
         } else {
             m = &materials[s.material_idx];
         }
-        p.set("material.diffuse", *m->diffuse);
-        p.set("material.specular", *m->specular);
-        p.set("material.ambient", *m->ambient);
-        p.set("material.emissive", *m->emissive);
-        p.set("material.shininess", m->shininess);
-        p.set("material.tint", tint);
 
-        glDrawElements(GL_TRIANGLES, s.num_indices, GL_UNSIGNED_INT,
+        if (m->diffuse_tex) {
+            p.set("material.diffuse.tex_on", true);
+            p.set("material.diffuse.tex", *m->diffuse_tex);
+        } else {
+            p.set("material.diffuse.tex_on", false);
+            p.set("material.diffuse.color", m->diffuse_color);
+        }
+
+        if (m->specular_tex) {
+            p.set("material.specular.tex_on", true);
+            p.set("material.specular.tex", *m->specular_tex);
+        } else {
+            p.set("material.specular.tex_on", false);
+            p.set("material.specular.color", m->specular_color);
+        }
+
+        if (m->ambient_tex) {
+            p.set("material.ambient.tex_on", true);
+            p.set("material.ambient.tex", *m->ambient_tex);
+        } else {
+            p.set("material.ambient.tex_on", false);
+            p.set("material.ambient.color", m->ambient_color);
+        }
+
+        if (m->emissive_tex) {
+            p.set("material.emissive.tex_on", true);
+            p.set("material.emissive.tex", *m->emissive_tex);
+        } else {
+            p.set("material.emissive.tex_on", false);
+            p.set("material.emissive.color", m->emissive_color);
+        }
+
+        p.set("material.shininess", m->shininess);
+        p.set("material.tint", glm::vec3(color));
+        p.set("material.alpha", color.a);
+
+        glDrawElements(
+            GL_TRIANGLES,
+            s.num_indices,
+            GL_UNSIGNED_INT,
             (void *)((size_t)s.start_index * sizeof(indices[0])));
     }
     glBindVertexArray(0);
 }
+
 }

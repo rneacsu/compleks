@@ -18,9 +18,10 @@ program::program()
     glAttachShader(id, vertex_shader.id);
     glAttachShader(id, fragment_shader.id);
 
-    update_shaders(
-        std::make_unique<compleks::resource>("res/vertex_shader.glsl"),
-        std::make_unique<compleks::resource>("res/fragment_shader.glsl"));
+    vertex_shader.compile(std::make_unique<resource>("res/main.vs.glsl"));
+    fragment_shader.compile(std::make_unique<resource>("res/main.fs.glsl"));
+
+    link();
 }
 
 program::~program()
@@ -30,19 +31,17 @@ program::~program()
     glDeleteProgram(id);
 }
 
-void program::update_shaders(std::unique_ptr<resource> v_shader_src,
-    std::unique_ptr<resource> f_shader_src)
+bool program::reload()
 {
-    if (v_shader_src && f_shader_src) {
-        bool v_ok = vertex_shader.compile(std::move(v_shader_src));
-        bool f_ok = fragment_shader.compile(std::move(f_shader_src));
-
-        if (!v_ok || !f_ok) {
-            return;
-        }
-    } else if (!vertex_shader.compile() || !fragment_shader.compile()) {
-        return;
+    if (!vertex_shader.reload() || !fragment_shader.reload()) {
+        return false;
     }
+
+    return link();
+}
+
+bool program::link()
+{
     glLinkProgram(id);
 
     int result, length;
@@ -53,11 +52,13 @@ void program::update_shaders(std::unique_ptr<resource> v_shader_src,
         glGetProgramInfoLog(id, length, NULL, msg.get());
         logger::error("Linking error:\n"s + msg.get());
 
-        return;
+        return false;
     }
 
     linked = true;
     glUseProgram(id);
+
+    return true;
 }
 
 GLint program::get_location(std::string var)
@@ -97,6 +98,13 @@ void program::set(std::string var, glm::vec3 value)
     if (!linked)
         return;
     glUniform3fv(get_location(var), 1, glm::value_ptr(value));
+}
+
+void program::set(std::string var, glm::vec4 value)
+{
+    if (!linked)
+        return;
+    glUniform4fv(get_location(var), 1, glm::value_ptr(value));
 }
 
 void program::set(std::string var, glm::mat4 value)

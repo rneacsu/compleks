@@ -23,7 +23,7 @@ image::image(const resource &res)
 {
     int n;
 
-    logger::info("Loading image from resource");
+    logger::info("Creating image from resource");
 
     pixels = stbi_load_from_memory(
         (stbi_uc *)res.ptr, (int)res.size, &width, &height, &n, 4);
@@ -36,7 +36,7 @@ image::image(const resource &res)
 image::~image()
 {
     if (pixels) {
-        logger::info("Releasing image");
+        logger::info("Destroying image");
         stbi_image_free(pixels);
     }
 }

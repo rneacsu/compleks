@@ -2,13 +2,12 @@
 
 #include <compleks.h>
 
-#include <memory>
-
 class gate_shape : public compleks::shape {
 public:
-    gate_shape(float width, float height, float length);
+    gate_shape();
 
 private:
-    compleks::shape wall;
+    compleks::shape wall_left;
+    compleks::shape wall_right;
     compleks::shape ceil;
 };

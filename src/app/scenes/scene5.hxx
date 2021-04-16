@@ -4,7 +4,7 @@
 
 class scene5 : public compleks::scene {
 public:
-    scene5(compleks::world &world);
+    scene5();
 
 private:
     std::shared_ptr<compleks::lighting::light> sun;

@@ -31,14 +31,22 @@ window::window()
     glfwWindowHint(GLFW_SAMPLES, 4);
 
     ctx = glfwCreateWindow(
-        DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_TITLE, NULL, NULL);
+        DEFAULT_WIDTH,
+        DEFAULT_HEIGHT,
+        DEFAULT_TITLE.c_str(),
+        NULL,
+        NULL);
     if (!ctx) {
         throw std::runtime_error("Could not create window");
     }
 
     const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    glfwSetWindowPos(ctx, (mode->width - DEFAULT_WIDTH) / 2,
+    glfwSetWindowPos(
+        ctx,
+        (mode->width - DEFAULT_WIDTH) / 2,
         (mode->height - DEFAULT_HEIGHT) / 2);
+
+    set_icon(0);
 }
 
 void window::glfw_error_func(int code, const char *msg)
@@ -47,9 +55,9 @@ void window::glfw_error_func(int code, const char *msg)
         std::string("GLFW error: ") + msg + " (" + std::to_string(code) + ")");
 }
 
-void window::config(char const *title, int w, int h)
+void window::config(std::string title, int w, int h)
 {
-    glfwSetWindowTitle(ctx, title);
+    glfwSetWindowTitle(ctx, title.c_str());
     glfwSetWindowSize(ctx, w, h);
 }
 
@@ -65,9 +73,30 @@ void window::set_icon(const image &icon)
 void window::set_icon(int res_id)
 {
     HWND win_h = glfwGetWin32Window(ctx);
-    HICON icon_h = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(res_id));
-    SendMessage(win_h, WM_SETICON, ICON_SMALL, (LPARAM)icon_h);
-    SendMessage(win_h, WM_SETICON, ICON_BIG, (LPARAM)icon_h);
+    HICON icon_h;
+    HMODULE module_h = GetModuleHandle(NULL);
+
+    if (!res_id) {
+        char path[1024];
+        DWORD ret = GetModuleFileName(module_h, path, sizeof(path));
+
+        if (!ret || ret == sizeof(path)) {
+            return;
+        }
+
+        icon_h = ExtractIconA(module_h, path, 0);
+        if (icon_h == (HICON)1) {
+            return;
+        }
+
+    } else {
+        icon_h = LoadIcon(module_h, MAKEINTRESOURCE(res_id));
+    }
+
+    if (icon_h) {
+        SendMessage(win_h, WM_SETICON, ICON_SMALL, (LPARAM)icon_h);
+        SendMessage(win_h, WM_SETICON, ICON_BIG, (LPARAM)icon_h);
+    }
 }
 
 window::~window()
@@ -113,7 +142,13 @@ void window::toggle_fullscreen()
         old_x = x;
         old_y = y;
         glfwSetWindowMonitor(
-            ctx, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+            ctx,
+            monitor,
+            0,
+            0,
+            mode->width,
+            mode->height,
+            mode->refreshRate);
     } else {
         glfwSetWindowMonitor(ctx, NULL, old_x, old_y, old_w, old_h, 0);
     }
@@ -123,6 +158,10 @@ void window::toggle_fullscreen()
 
 void window::render(double)
 {
+}
+
+extern "C" {
+_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 }
 
 }

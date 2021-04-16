@@ -2,6 +2,7 @@
 #define __COMPLEKS_UTILS_LIBRARY_HXX
 
 #include <map>
+#include <memory>
 #include <string>
 #include <utility>
 
@@ -9,10 +10,12 @@ namespace compleks {
 
 template <class T> class library {
 public:
-    template <class... Args> void add(std::string id, Args &&... args)
+    template <class... Args> void add(std::string id, Args &&...args)
     {
         remove(id);
-        lib.emplace(std::piecewise_construct, std::forward_as_tuple(id),
+        lib.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(id),
             std::forward_as_tuple(args...));
     }
 
@@ -27,6 +30,11 @@ public:
     T &get(std::string id)
     {
         return lib.at(id);
+    }
+
+    bool exists(std::string id)
+    {
+        return lib.find(id) != lib.end();
     }
 
 private:

@@ -3,26 +3,22 @@
 
 #include <compleks.h>
 
-#include "demo_world.hxx"
-#include "resource.h"
-
-using namespace std::literals;
+#include "demo.hxx"
 
 int main(int, char *[])
 {
     compleks::logger::info("Starting...");
 
+    int rc = EXIT_SUCCESS;
     try {
-        demo_world win;
-
-        win.set_icon(APP_ICON);
+        demo win;
         win.run();
-
     } catch (std::exception &e) {
-        compleks::logger::error("Exception occured: "s + e.what());
+        compleks::logger::error(std::string("Exception occured: ") + e.what());
+        rc = EXIT_FAILURE;
     }
 
     compleks::logger::info("Exiting...");
 
-    return EXIT_SUCCESS;
+    return rc;
 }

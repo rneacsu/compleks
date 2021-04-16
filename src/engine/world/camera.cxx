@@ -1,60 +1,65 @@
 #include "camera.hxx"
 
-#include <iostream>
 #include <string>
 
-#include <GLFW/glfw3.h>
 #include <glm/gtx/rotate_vector.hpp>
 
-#include "../utils/logger.hxx"
-
-using namespace std::literals;
+#include "../core/engine.hxx"
 
 namespace compleks {
 
 camera::camera()
-    : body("")
+    : body("", MASS, false)
 {
-    body.mass = 80;
-    body.create_body(std::make_shared<shape>(std::make_unique<btCapsuleShape>(
-                         0.3f, eye_height - 0.5f)),
-        false);
+    body.create_body(std::make_unique<shape>(
+        std::make_unique<btCapsuleShape>(RADIUS, HEIGHT - 2 * RADIUS)));
 
     body.rigid_body->setActivationState(DISABLE_DEACTIVATION);
+
+    walk_front = walk_right = elevate = tilt = 0;
+    sprint = false;
+    cam_type = NORMAL;
+
+    engine::get().add_listener(this);
+
     reset();
 }
 
 void camera::update(double delta)
 {
-    if (!enabled) {
-        return;
-    }
-
     old_pos = pos;
 
-    glm::vec3 acceleration;
-
     glm::vec3 velocity = body.get_velocity();
-    velocity.y = 0;
-    float speed = glm::length(velocity);
-    float top_speed = max_speed * (sprint ? sprint_multiplier : 1.0f);
-    if (top_speed - speed > 0 && (walk_front || walk_right)) {
-        acceleration
-            = glm::normalize(glm::vec3(front.x, 0, front.z)) * (float)walk_front
-            + glm::normalize(glm::vec3(right.x, 0, right.z))
-                * (float)walk_right;
-        acceleration = glm::normalize(acceleration);
+    glm::vec3 acc = glm::vec3(0);
+    float top_speed = max_speed;
 
-        acceleration *= 40.0f;
-    } else {
-        acceleration = -velocity * 10.0f;
+    if (cam_type == NORMAL) {
+        velocity.y = 0;
     }
 
-    btVector3 acc(acceleration.x, acceleration.y, acceleration.z);
-    body.rigid_body->applyCentralForce(acc * body.mass);
+    if (cam_type == FREEFORM || sprint) {
+        top_speed *= sprint_multiplier;
+    }
 
-    body.update_all(delta);
-    pos = body.pos + glm::vec3(0, eye_height / 2, 0);
+    if (top_speed - glm::length(velocity) > 0
+        && (walk_front || walk_right || (cam_type == FREEFORM && elevate))) {
+        acc += glm::normalize(glm::vec3(front.x, 0, front.z))
+            * (float)walk_front;
+        acc += glm::normalize(glm::vec3(right.x, 0, right.z))
+            * (float)walk_right;
+        if (cam_type == FREEFORM) {
+            acc += glm::vec3(0, 1, 0) * (float)elevate;
+        }
+        acc = glm::normalize(acc) * 40.0f;
+    }
+
+    acc += -velocity * 10.0f;
+    acc *= body.get_mass();
+
+    body.rigid_body->applyCentralForce(physics::to_bt(acc));
+    body.update(delta);
+
+    pos = body.pos + glm::vec3(0, EYE_HEIGHT - HEIGHT / 2, 0);
 
     if (tilt) {
         roll += tilt * (float)delta;
@@ -79,7 +84,7 @@ glm::mat4 camera::get_view_matrix(view_type t)
 
 glm::mat4 camera::get_projection_matrix(int width, int height)
 {
-    return glm::perspective(fov, width / (float)height, 0.001f, 100.0f);
+    return glm::perspective(fov, width / (float)height, NEAR_CLIP, FAR_CLIP);
 }
 
 glm::vec3 camera::get_position()
@@ -87,11 +92,14 @@ glm::vec3 camera::get_position()
     return pos;
 }
 
-void camera::set_position(glm::vec3 p)
+void camera::set_position(glm::vec3 p, glm::vec3 old)
 {
-    pos = old_pos = p;
+    pos = p;
+    old_pos = old;
 
-    body.set_position(pos - glm::vec3(0, eye_height / 2, 0));
+    glm::vec3 delta = glm::vec3(0, EYE_HEIGHT - HEIGHT / 2, 0);
+
+    body.set_position(pos - delta, old_pos - delta);
 }
 
 glm::vec3 camera::get_velocity()
@@ -117,11 +125,6 @@ glm::vec3 camera::get_orientation()
     return glm::vec3(pitch, yaw, roll);
 }
 
-void camera::set_enabled(bool en)
-{
-    enabled = en;
-}
-
 void camera::key_down(int key, int)
 {
     switch (key) {
@@ -144,7 +147,6 @@ void camera::key_down(int key, int)
         tilt += 1;
         break;
     case GLFW_KEY_SPACE:
-        body.rigid_body->applyCentralImpulse(btVector3(0.0f, 350.0f, 0.0f));
         elevate += 1;
         break;
     case GLFW_KEY_LEFT_SHIFT:
@@ -155,6 +157,12 @@ void camera::key_down(int key, int)
     case GLFW_KEY_R:
         reset();
         break;
+    case GLFW_KEY_C:
+        if (cam_type == NORMAL) {
+            set_camera_type(FREEFORM);
+        } else {
+            set_camera_type(NORMAL);
+        }
     }
 }
 void camera::key_up(int key, int)
@@ -191,25 +199,28 @@ void camera::key_up(int key, int)
 
 void camera::mouse_move(float dx, float dy)
 {
-    if ((dx || dy) && !enabled) {
+    if ((dx || dy) && !engine::get().focused) {
         return;
     }
 
     yaw += (dx * cos(roll) + dy * sin(roll)) * sensitivity;
     pitch += (dx * sin(roll) - dy * cos(roll)) * sensitivity;
-    pitch
-        = glm::min(glm::max(pitch, glm::radians(-89.0f)), glm::radians(89.0f));
+    pitch = glm::clamp(pitch, glm::radians(-89.0f), glm::radians(89.0f));
 
-    front = glm::normalize(glm::vec3(glm::cos(yaw) * glm::cos(pitch),
-        glm::sin(pitch), glm::sin(yaw) * glm::cos(pitch)));
-    right = glm::normalize(glm::vec3(-glm::sin(yaw) * glm::cos(roll),
-        glm::sin(roll), glm::cos(yaw) * glm::cos(roll)));
+    front = glm::normalize(glm::vec3(
+        glm::cos(yaw) * glm::cos(pitch),
+        glm::sin(pitch),
+        glm::sin(yaw) * glm::cos(pitch)));
+    right = glm::normalize(glm::vec3(
+        -glm::sin(yaw) * glm::cos(roll),
+        glm::sin(roll),
+        glm::cos(yaw) * glm::cos(roll)));
     up = glm::cross(right, front);
 }
 
 void camera::mouse_scroll(float delta)
 {
-    if (!enabled) {
+    if (!engine::get().focused) {
         return;
     }
 
@@ -218,17 +229,16 @@ void camera::mouse_scroll(float delta)
 
 void camera::reset()
 {
-    pos = { 1.5, eye_height, 1.5 };
+    pos = { 1.5, EYE_HEIGHT, 1.5 };
     up = { 0, 1, 0 };
     yaw = glm::radians(-135.0f);
     pitch = glm::radians(-30.0f);
     roll = 0;
     fov = glm::radians(60.0f);
-    walk_front = walk_right = elevate = tilt = 0;
-    sprint = false;
 
-    set_position(pos);
+    set_position(pos, pos);
     set_velocity({ 0, 0, 0 });
+    set_camera_type(NORMAL);
     body.rigid_body->clearForces();
 
     mouse_move(0.0f, 0.0f);
@@ -242,6 +252,24 @@ glm::vec3 camera::get_old_position(void)
 glm::vec3 camera::get_front(void)
 {
     return front;
+}
+
+camera::camera_type camera::get_camera_type(void)
+{
+    return cam_type;
+}
+
+void camera::set_camera_type(camera::camera_type type)
+{
+    cam_type = type;
+    body.set_gravity(type == NORMAL);
+    body.set_collisions(type == NORMAL);
+}
+
+void camera::jump(void)
+{
+    glm::vec3 f = glm::vec3(0, JUMP_FORCE, 0) * body.get_mass();
+    body.rigid_body->applyCentralImpulse(physics::to_bt(f));
 }
 
 } // namespace compleks

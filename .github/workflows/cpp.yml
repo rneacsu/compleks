@@ -12,30 +12,26 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout branch
-      uses: actions/checkout@v2
-      with:
-        lfs: true
-      
-    - name: Configure
-      run: |
-        cmake -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -B build
-        
-    - name: Build
-      run: cmake --build build --config Release
+      - name: Checkout branch
+        uses: actions/checkout@v2
+        with:
+          lfs: true
 
-    - name: Create packages
-      run: cpack
-      working-directory: build
-      
-    - name: Upload ZIP
-      uses: actions/upload-artifact@v2.1.4
-      with:
-        name: zip
-        path: build/*.zip
+      - name: Configure
+        run: >
+          cmake -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+          -DCMAKE_BUILD_TYPE=Release -B build
 
-    - name: Upload NSIS
-      uses: actions/upload-artifact@v2.1.4
-      with:
-        name: windows
-        path: build/*.exe
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Create packages
+        run: cpack
+        working-directory: build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          path: |
+            build/*.zip
+            build/*.exe

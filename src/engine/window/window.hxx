@@ -2,24 +2,26 @@
 #define COMPLEKS_CORE_WINDOW_HXX
 
 #include <mutex>
+#include <string>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include "../image/image.hxx"
+#include "../utils/logger.hxx"
 
 namespace compleks {
 
 class window {
 public:
-    char const *const DEFAULT_TITLE = "Compleks";
+    std::string const DEFAULT_TITLE = "Compleks";
     int const DEFAULT_WIDTH = 640;
     int const DEFAULT_HEIGHT = 480;
 
     window();
     ~window();
 
-    void config(char const *title, int w, int h);
+    void config(std::string title, int w, int h);
     void run(void);
     void set_icon(const image &img);
     void set_icon(int res_id);

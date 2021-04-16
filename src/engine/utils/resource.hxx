@@ -9,7 +9,6 @@ namespace compleks {
 class resource {
 public:
     char *ptr;
-    std::unique_ptr<char[]> uptr;
     size_t size;
 
     resource(std::string name, std::string type);
@@ -20,6 +19,7 @@ public:
     void reload();
 
 private:
+    std::unique_ptr<char[]> uptr;
     std::string path;
 };
 

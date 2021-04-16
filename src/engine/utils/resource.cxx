@@ -7,8 +7,6 @@
 
 #include <Windows.h>
 
-using namespace std::literals;
-
 namespace compleks {
 
 resource::resource()
@@ -47,7 +45,7 @@ resource::resource(std::string path)
 
 resource::~resource()
 {
-    logger::info("Releasing resource");
+    logger::info("Destroying resource");
 }
 
 void resource::reload()
@@ -60,7 +58,7 @@ void resource::reload()
     std::ifstream fs(path, std::ios::ate | std::ios::binary);
 
     if (!fs) {
-        throw std::runtime_error("Could not open resource "s + path);
+        throw std::runtime_error("Could not open resource " + path);
     }
 
     auto end = fs.tellg();
@@ -74,7 +72,7 @@ void resource::reload()
     ptr = uptr.get();
 
     if (!fs.read((char *)ptr, size)) {
-        throw std::runtime_error("Could not read resource "s + path);
+        throw std::runtime_error("Could not read resource " + path);
     }
 }
 

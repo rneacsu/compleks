@@ -11,11 +11,11 @@ public:
     shape();
     shape(std::unique_ptr<btCollisionShape> s);
 
-    btCollisionShape *get_shape(void);
+    btCollisionShape &get_shape(void);
     void set_shape(std::unique_ptr<btCollisionShape> s);
 
 protected:
-    std::unique_ptr<btCollisionShape> collision_shape;
+    std::unique_ptr<btCollisionShape> bt_shape;
 };
 
 } // namespace compleks

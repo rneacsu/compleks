@@ -34,7 +34,11 @@ void input_window::remove_listener(input_listener *l)
 }
 
 void input_window::key_callback(
-    GLFWwindow *ctx, int key, int, int action, int mods)
+    GLFWwindow *ctx,
+    int key,
+    int,
+    int action,
+    int mods)
 {
     for (auto &listener : listeners[ctx].second) {
         if (action == GLFW_PRESS) {
@@ -63,7 +67,10 @@ void input_window::mouse_move_callback(GLFWwindow *ctx, double x, double y)
 }
 
 void input_window::mouse_button_callback(
-    GLFWwindow *ctx, int button, int action, int)
+    GLFWwindow *ctx,
+    int button,
+    int action,
+    int)
 {
     for (auto &listener : listeners[ctx].second) {
         if (action == GLFW_PRESS) {
@@ -99,7 +106,9 @@ void input_window::mouse_scroll_callback(GLFWwindow *ctx, double, double dy)
 }
 
 void input_window::window_resize_callback(
-    GLFWwindow *ctx, int width, int height)
+    GLFWwindow *ctx,
+    int width,
+    int height)
 {
     for (auto &listener : listeners[ctx].second) {
         listener->window_resize(width, height);
@@ -113,7 +122,7 @@ void input_window::set_cursor(bool enabled)
     } else {
         glfwSetInputMode(ctx, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
-    cursor_enabled = enabled;
+    focused = !enabled;
     glfwGetCursorPos(ctx, &old_x, &old_y);
 }
 

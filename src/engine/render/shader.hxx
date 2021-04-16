@@ -18,7 +18,8 @@ public:
     shader(type type);
     ~shader();
 
-    bool compile(std::unique_ptr<resource> src = nullptr);
+    bool compile(std::unique_ptr<resource> src);
+    bool reload();
 
 private:
     std::unique_ptr<resource> src;

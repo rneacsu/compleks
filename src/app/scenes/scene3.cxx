@@ -1,11 +1,8 @@
 #include "scene3.hxx"
 
-#include "../shapes/gate_shape.hxx"
+#include "../shapes/shapes.hxx"
 
-#include <iostream>
-
-scene3::scene3(compleks::world &world)
-    : scene(world)
+scene3::scene3()
 {
     sun = std::make_shared<compleks::lighting::light>();
     sun->pos = glm::vec3(40, 50, 40) * 20.0f;
@@ -15,41 +12,33 @@ scene3::scene3(compleks::world &world)
 
     glClearColor(135 / 255.0f, 206 / 255.0f, 235 / 255.0f, 1.0f);
 
-    std::shared_ptr<compleks::shape> shape;
-    std::unique_ptr<btCompoundShape> comp_shape;
-
     plane = std::make_shared<compleks::body>("quad");
     plane->pos = { 0, 0, 0 };
     plane->scale = { 50, 50, 1 };
     plane->quat = glm::quat({ glm::radians(-90.0f), 0.0f, 0.0f });
-    plane->color = { 151 / 255.0f, 255 / 255.0f, 99 / 255.0f };
-    shape = std::make_shared<compleks::shape>(
-        std::make_unique<btBoxShape>(btVector3(25.0f, 25.0f, 0.01f)));
-    plane->create_body(shape);
+    plane->color = { 151 / 255.0f, 255 / 255.0f, 99 / 255.0f, 1 };
+    plane->create_body(std::make_unique<plane_shape>());
 
-    cube = std::make_shared<compleks::body>("cube");
+    cube = std::make_shared<compleks::body>("cube", 10.0f);
     cube->pos = { 0, 0.5, 0 };
-    cube->mass = 10;
-    shape = std::make_shared<compleks::shape>(
-        std::make_unique<btBoxShape>(btVector3(0.5f, 0.5f, 0.5f)));
-    cube->create_body(shape);
+    cube->create_body(std::make_unique<cube_shape>());
 
     gate1 = std::make_shared<compleks::body>("gate");
     gate1->pos = { -2, 0, -4 };
     gate1->scale = { 1, 1, 16 };
-    gate1->color = { 1, 0.2, 0.2 };
-    gate1->create_body(std::make_shared<gate_shape>(1.0f, 2.0f, 4.0f));
+    gate1->color = { 1, 0.2, 0.2, 1 };
+    gate1->create_body(std::make_unique<gate_shape>());
 
     gate2 = std::make_shared<compleks::body>("gate");
     gate2->pos = { 2, 0, -2.5 };
     gate2->scale = { 1, 1, 4 };
-    gate2->color = { 0.2, 0.2, 1 };
-    gate2->create_body(std::make_shared<gate_shape>(1.0f, 2.0f, 1.0f));
+    gate2->color = { 0.2, 0.2, 1, 1 };
+    gate2->create_body(std::make_unique<gate_shape>());
 
-    world.objects.push_back(cube);
-    world.objects.push_back(plane);
-    world.objects.push_back(gate1);
-    world.objects.push_back(gate2);
+    world.dynamic_objects.push_back(cube);
+    world.static_objects.push_back(plane);
+    world.static_objects.push_back(gate1);
+    world.static_objects.push_back(gate2);
 
     p1 = std::make_shared<compleks::portal>();
     p2 = std::make_shared<compleks::portal>();
@@ -96,10 +85,10 @@ scene3::scene3(compleks::world &world)
     p7->set_target(p8);
     p8->set_target(p7);
 
-    p2->get_sub_portals().push_back(p7);
-    p4->get_sub_portals().push_back(p5);
-    p5->get_sub_portals().push_back(p4);
-    p7->get_sub_portals().push_back(p2);
+    p2->sub_portals.push_back(p7);
+    p4->sub_portals.push_back(p5);
+    p5->sub_portals.push_back(p4);
+    p7->sub_portals.push_back(p2);
 
     // Outside
     world.portals.push_back(p1);
