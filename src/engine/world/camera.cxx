@@ -154,9 +154,6 @@ void camera::key_down(int key, int)
         sprint = true;
         elevate -= 1;
         break;
-    case GLFW_KEY_R:
-        reset();
-        break;
     case GLFW_KEY_C:
         if (cam_type == NORMAL) {
             set_camera_type(FREEFORM);

@@ -55,6 +55,11 @@ library<mesh> &engine::get_meshes()
     return instance->meshes;
 }
 
+library<engine::shape_generator_t> &engine::get_shapes()
+{
+    return instance->shapes;
+}
+
 lighting &engine::get_lighting()
 {
     return instance->light;

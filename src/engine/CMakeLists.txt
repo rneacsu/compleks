@@ -23,4 +23,5 @@ target_link_libraries(compleks
     glfw
     tinyobjloader::tinyobjloader
     LinearMath Bullet3Common BulletCollision BulletDynamics
+    nlohmann_json::nlohmann_json
 )

@@ -3,6 +3,8 @@
 
 #include <compleks.h>
 
+#include "overlay.hxx"
+
 class demo : public compleks::engine {
 public:
     demo();
@@ -10,11 +12,11 @@ public:
     void key_down(int, int) override;
     void render(double delta) override;
 
+    std::unique_ptr<compleks::scene> create_scene(int scene_num);
+
 private:
     int current_scene_num;
-    float overlay_alpha = 0;
-
-    std::shared_ptr<compleks::object> overlay;
+    overlay screen_overlay;
 };
 
 #endif // __DEMO_HXX

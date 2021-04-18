@@ -4,5 +4,4 @@ add_library(app_scenes OBJECT
     scene3.cxx
     scene4.cxx
     scene5.cxx
-    scene6.cxx
 )

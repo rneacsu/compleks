@@ -7,6 +7,7 @@ add_executable(main
     main.cpp
     bootstrap.cxx
     demo.cxx
+    overlay.cxx
     ${CMAKE_CURRENT_BINARY_DIR}/main.rc)
 
 target_link_libraries(main app_shapes app_scenes compleks)

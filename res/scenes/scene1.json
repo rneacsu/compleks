@@ -1,0 +1,113 @@
+{
+    "sky": {
+        "r": 135,
+        "g": 206,
+        "b": 235
+    },
+    "lights": {
+        "sun": {
+            "pos": {
+                "x": 800,
+                "y": 1000,
+                "z": 800
+            }
+        }
+    },
+    "goal": {
+        "pos": {
+            "x": 0,
+            "y": 0,
+            "z": -10
+        },
+        "radius": 3
+    },
+    "bodies": {
+        "plane": {
+            "mesh": "quad",
+            "shape": "plane",
+            "scale": {
+                "x": 50,
+                "y": 50
+            },
+            "quat": {
+                "pitch": -90.0
+            },
+            "color": {
+                "r": 151,
+                "g": 255,
+                "b": 99
+            }
+        },
+        "box": {
+            "mesh": "cube",
+            "shape": "cube",
+            "mass": 10,
+            "pos": {
+                "y": 0.5
+            },
+            "scale": {
+                "x": 0.8,
+                "y": 0.8,
+                "z": 0.8
+            }
+        },
+        "gate1": {
+            "mesh": "gate",
+            "shape": "gate",
+            "pos": {
+                "x": -2,
+                "y": 0,
+                "z": -2
+            },
+            "color": {
+                "r": 255,
+                "g": 50,
+                "b": 50
+            }
+        },
+        "gate2": {
+            "mesh": "gate",
+            "shape": "gate",
+            "pos": {
+                "x": 2,
+                "y": 0,
+                "z": -2
+            },
+            "color": {
+                "r": 50,
+                "g": 50,
+                "b": 255
+            }
+        }
+    },
+    "portals": {
+        "p1": {
+            "target": "p2",
+            "pos": {
+                "x": -2,
+                "y": 1,
+                "z": -2
+            },
+            "scale": {
+                "y": 2
+            },
+            "subPortals": [
+                "p2"
+            ]
+        },
+        "p2": {
+            "target": "p1",
+            "pos": {
+                "x": 2,
+                "y": 1,
+                "z": -2
+            },
+            "scale": {
+                "y": 2
+            },
+            "subPortals": [
+                "p1"
+            ]
+        }
+    }
+}

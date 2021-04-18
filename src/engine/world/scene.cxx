@@ -148,4 +148,11 @@ void scene::apply_drag_force(body &b, glm::vec3 target_pos)
     b.rigid_body->applyCentralForce(physics::to_bt(force));
 }
 
+void scene::load_scene(std::string path)
+{
+    resource r(path);
+    config = nlohmann::ordered_json::parse(std::string(r.ptr, r.size));
+    scene_loader(*this).load(config);
+}
+
 } // namespace compleks

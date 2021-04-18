@@ -12,6 +12,7 @@ find_package(glm CONFIG REQUIRED)
 find_path(STB_INCLUDE_DIRS stb.h REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
 find_package(bullet CONFIG REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 set(CMAKE_CXX_FLAGS
     "/EHsc /W4 /WX \

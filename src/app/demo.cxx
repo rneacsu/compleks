@@ -1,81 +1,102 @@
 #include "demo.hxx"
 #include <iostream>
 
-#include "scenes/scene1.hxx"
-#include "scenes/scene2.hxx"
-#include "scenes/scene3.hxx"
-#include "scenes/scene4.hxx"
-#include "scenes/scene5.hxx"
-#include "scenes/scene6.hxx"
+#include "scenes/scenes.hxx"
+#include "shapes/shapes.hxx"
 
 demo::demo()
 {
-    get_meshes().add("cube", "res/cube.obj");
-    get_meshes().add("gate", "res/gate.obj");
+    get_meshes().add("cube", "res/meshes/box.obj");
+    get_meshes().add("gate", "res/meshes/gate.obj");
+
+    get_shapes().add("plane", []() { return std::make_unique<plane_shape>(); });
+    get_shapes().add("cube", []() { return std::make_unique<cube_shape>(); });
+    get_shapes().add("gate", []() { return std::make_unique<gate_shape>(); });
 
     get_world().current_scene = std::make_unique<scene1>();
     current_scene_num = 1;
+    screen_overlay.animate(overlay::FADE_OUT);
+}
 
-    overlay = std::make_shared<compleks::object>("quad");
-    overlay->pos = { 25, 25, 0 };
-    // overlay->pos = { 0, 0, 0 };
-    overlay->scale = { 50, 50, 1 };
-    overlay->color = { 0.85f, 0.85f, 0.85f, overlay_alpha };
+std::unique_ptr<compleks::scene> demo::create_scene(int scene_num)
+{
+    switch (scene_num) {
+    case 1:
+        return std::make_unique<scene1>();
+    case 2:
+        return std::make_unique<scene2>();
+    case 3:
+        return std::make_unique<scene3>();
+    case 4:
+        return std::make_unique<scene4>();
+    case 5:
+        return std::make_unique<scene5>();
+    }
 
-    get_world().hud.push_back(overlay);
+    return nullptr;
 }
 
 void demo::key_down(int key, int mods)
 {
     compleks::engine::key_down(key, mods);
     int scene_num = key - GLFW_KEY_0;
-    if (scene_num > 0 && scene_num < 7 && scene_num != current_scene_num) {
-        current_scene_num = scene_num;
 
-        compleks::logger::info(
-            "Loading scene " + std::to_string(current_scene_num));
+    if (screen_overlay.is_running()) {
+        return;
+    }
 
-        get_world().current_scene = nullptr;
+    if (scene_num > 0 && scene_num <= NUM_SCENES
+        && scene_num != current_scene_num) {
+        screen_overlay.set_callback([this, scene_num]() {
+            current_scene_num = scene_num;
 
-        std::unique_ptr<compleks::scene> new_scene;
-        switch (scene_num) {
-        case 1:
-            new_scene = std::make_unique<scene1>();
-            break;
-        case 2:
-            new_scene = std::make_unique<scene2>();
-            break;
-        case 3:
-            new_scene = std::make_unique<scene3>();
-            break;
-        case 4:
-            new_scene = std::make_unique<scene4>();
-            break;
-        case 5:
-            new_scene = std::make_unique<scene5>();
-            break;
-        case 6:
-            new_scene = std::make_unique<scene6>();
-            break;
-        }
+            compleks::logger::info(
+                "Loading scene " + std::to_string(current_scene_num));
 
-        get_world().current_scene = std::move(new_scene);
+            get_world().current_scene = nullptr;
+            get_world().current_scene = create_scene(current_scene_num);
+        });
+        screen_overlay.animate(overlay::FADE_IN_OUT);
+    }
+
+    if (key == GLFW_KEY_R) {
+        screen_overlay.set_callback([this]() {
+            compleks::logger::info(
+                "Reloading scene " + std::to_string(current_scene_num));
+
+            get_world().current_scene = nullptr;
+            get_world().current_scene = create_scene(current_scene_num);
+        });
+        screen_overlay.animate(overlay::FADE_IN_OUT);
     }
 }
 
-
 void demo::render(double delta)
 {
+    screen_overlay.update(delta);
     engine::render(delta);
 
-    overlay_alpha += (float)(2 * delta);
-    if (overlay_alpha > 2) {
-        overlay_alpha -= 2;
-    }
+    // Check goal
+    if (!screen_overlay.is_running()) {
+        auto &j = get_world().current_scene->config;
+        if (j.contains("goal")) {
+            glm::vec3 pos = compleks::scene_loader::get_pos(j["goal"]["pos"]);
+            float r = j["goal"]["radius"];
 
-    if (overlay_alpha > 1) {
-        overlay->color.a = 2 - overlay_alpha;
-    } else {
-        overlay->color.a = overlay_alpha;
+            if (glm::length(get_world().camera.get_position() - pos) < r) {
+                screen_overlay.set_callback([this]() {
+                    if (++current_scene_num > NUM_SCENES) {
+                        current_scene_num = 1;
+                    }
+
+                    compleks::logger::info(
+                        "Loading scene " + std::to_string(current_scene_num));
+
+                    get_world().current_scene = nullptr;
+                    get_world().current_scene = create_scene(current_scene_num);
+                });
+                screen_overlay.animate(overlay::FADE_IN_OUT);
+            }
+        }
     }
 }

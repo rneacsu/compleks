@@ -115,6 +115,8 @@ window::~window()
 
 void window::run()
 {
+    old_time = glfwGetTime();
+
     while (!glfwWindowShouldClose(ctx)) {
         glfwGetWindowSize(ctx, &width, &height);
         glfwGetWindowPos(ctx, &x, &y);
