@@ -25,7 +25,7 @@ public:
     void run(void);
     void set_icon(const image &img);
     void set_icon(int res_id);
-    void toggle_fullscreen(void);
+    virtual void toggle_fullscreen(void);
 
     virtual void render(double delta);
 

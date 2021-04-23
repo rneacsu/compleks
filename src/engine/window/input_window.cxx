@@ -55,6 +55,12 @@ void input_window::mouse_move_callback(GLFWwindow *ctx, double x, double y)
     input_window *window = instance.first;
     auto &window_listeners = instance.second;
 
+    if (window->ignore_move) {
+        glfwGetCursorPos(ctx, &window->old_x, &window->old_y);
+        window->ignore_move = false;
+        return;
+    }
+
     float dx = (float)(x - window->old_x);
     float dy = (float)(y - window->old_y);
 
@@ -124,6 +130,12 @@ void input_window::set_cursor(bool enabled)
     }
     focused = !enabled;
     glfwGetCursorPos(ctx, &old_x, &old_y);
+}
+
+void input_window::toggle_fullscreen(void)
+{
+    window::toggle_fullscreen();
+    ignore_move = true;
 }
 
 }

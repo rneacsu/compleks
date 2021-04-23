@@ -20,9 +20,12 @@ class world;
 class scene : public input_listener {
 public:
     const float GRAB_DISTANCE = 2.0f;
-    const float GRAB_FORCE = 250.0f;
+    const float GRAB_FORCE = 5.0f;
 
     nlohmann::ordered_json config;
+    std::map<std::string, std::shared_ptr<lighting::light>> lights;
+    std::map<std::string, std::shared_ptr<body>> bodies;
+    std::map<std::string, std::shared_ptr<portal>> portals;
 
     scene(void);
     virtual ~scene();
@@ -39,15 +42,12 @@ public:
 protected:
     world &world;
     std::shared_ptr<body> dragged_object;
-    std::map<std::string, std::shared_ptr<lighting::light>> lights;
-    std::map<std::string, std::shared_ptr<body>> bodies;
-    std::map<std::string, std::shared_ptr<portal>> portals;
 
 private:
     friend class scene_loader;
 
     std::shared_ptr<body> object_ray_test(void);
-    void apply_drag_force(body &b, glm::vec3 target_pos);
+    void apply_drag_force(body &b, glm::vec3 target_pos, double delta);
 };
 
 } // namespace compleks

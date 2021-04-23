@@ -18,6 +18,8 @@ public:
     void remove_listener(input_listener *);
     void set_cursor(bool enabled);
 
+    void toggle_fullscreen(void) override;
+
     bool focused = false;
 
 private:
@@ -33,6 +35,7 @@ private:
     static void window_resize_callback(GLFWwindow *, int, int);
 
     double old_x, old_y;
+    bool ignore_move = false;
 };
 
 }

@@ -12,11 +12,12 @@ public:
     void key_down(int, int) override;
     void render(double delta) override;
 
-    std::unique_ptr<compleks::scene> create_scene(int scene_num);
+    void load_scene(int scene_num);
 
 private:
     int current_scene_num;
     overlay screen_overlay;
+    std::shared_ptr<compleks::body> goal;
 };
 
 #endif // __DEMO_HXX

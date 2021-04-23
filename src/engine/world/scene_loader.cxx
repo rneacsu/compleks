@@ -33,6 +33,10 @@ glm::vec3 scene_loader::get_pos(nlohmann::ordered_json &j)
 
 glm::vec3 scene_loader::get_scale(nlohmann::ordered_json &j)
 {
+    if (j.is_number()) {
+        return glm::vec3(j);
+    }
+
     glm::vec3 scale(1);
 
     if (j.contains("x")) {

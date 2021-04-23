@@ -47,8 +47,12 @@ mesh::mesh(std::string path)
                 glm::make_vec3(attr.vertices.data() + 3 * idx.vertex_index));
             normals.push_back(
                 glm::make_vec3(attr.normals.data() + 3 * idx.normal_index));
-            tex_coords.push_back(
-                glm::make_vec2(attr.texcoords.data() + 2 * idx.texcoord_index));
+            if (idx.texcoord_index >= 0) {
+                tex_coords.push_back(glm::make_vec2(
+                    attr.texcoords.data() + 2 * idx.texcoord_index));
+            } else {
+                tex_coords.push_back(glm::vec2(0));
+            }
             indices.push_back(num_indices++);
         }
         s.num_indices = num_indices - s.start_index;

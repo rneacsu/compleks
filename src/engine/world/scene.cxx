@@ -92,7 +92,7 @@ void scene::key_down(int key, int)
     }
 }
 
-void scene::update(double)
+void scene::update(double delta)
 {
     if (dragged_object) {
         glm::vec3 eye_pos = world.camera.get_position();
@@ -128,20 +128,23 @@ void scene::update(double)
             clone_target_pos = tmp;
         }
 
-        apply_drag_force(*dragged_object, target_pos);
+        apply_drag_force(*dragged_object, target_pos, delta);
 
         if (p) {
-            apply_drag_force(*dragged_object->clone_body, clone_target_pos);
+            apply_drag_force(
+                *dragged_object->clone_body,
+                clone_target_pos,
+                delta);
         }
     }
 }
 
-void scene::apply_drag_force(body &b, glm::vec3 target_pos)
+void scene::apply_drag_force(body &b, glm::vec3 target_pos, double delta)
 {
     glm::vec3 dir = target_pos - b.pos;
     float len = glm::clamp(glm::length(dir), 0.0f, GRAB_DISTANCE);
-    glm::vec3 force
-        = glm::normalize(dir) * len * dragged_object->get_mass() * GRAB_FORCE;
+    glm::vec3 force = glm::normalize(dir) * len * dragged_object->get_mass()
+        * GRAB_FORCE / (float)delta;
 
     b.set_velocity(glm::vec3());
     b.rigid_body->setAngularVelocity(btVector3(0, 0, 0));

@@ -8,32 +8,50 @@ demo::demo()
 {
     get_meshes().add("cube", "res/meshes/box.obj");
     get_meshes().add("gate", "res/meshes/gate.obj");
+    get_meshes().add("goal", "res/meshes/hyperisocahedron.obj");
 
     get_shapes().add("plane", []() { return std::make_unique<plane_shape>(); });
     get_shapes().add("cube", []() { return std::make_unique<cube_shape>(); });
     get_shapes().add("gate", []() { return std::make_unique<gate_shape>(); });
 
-    get_world().current_scene = std::make_unique<scene1>();
-    current_scene_num = 1;
+    load_scene(1);
     screen_overlay.animate(overlay::FADE_OUT);
 }
 
-std::unique_ptr<compleks::scene> demo::create_scene(int scene_num)
+void demo::load_scene(int scene_num)
 {
+    current_scene_num = scene_num;
+    std::unique_ptr<compleks::scene> s;
+
+    compleks::logger::info("Loading scene " + std::to_string(scene_num));
+
+    get_world().current_scene = nullptr;
     switch (scene_num) {
     case 1:
-        return std::make_unique<scene1>();
+        s = std::make_unique<scene1>();
+        break;
     case 2:
-        return std::make_unique<scene2>();
+        s = std::make_unique<scene2>();
+        break;
     case 3:
-        return std::make_unique<scene3>();
+        s = std::make_unique<scene3>();
+        break;
     case 4:
-        return std::make_unique<scene4>();
+        s = std::make_unique<scene4>();
+        break;
     case 5:
-        return std::make_unique<scene5>();
+        s = std::make_unique<scene5>();
+        break;
     }
 
-    return nullptr;
+    if (!s) {
+        return;
+    }
+
+    auto p = s->bodies.find("goal");
+    goal = p != s->bodies.end() ? p->second : nullptr;
+
+    get_world().current_scene = std::move(s);
 }
 
 void demo::key_down(int key, int mods)
@@ -47,26 +65,14 @@ void demo::key_down(int key, int mods)
 
     if (scene_num > 0 && scene_num <= NUM_SCENES
         && scene_num != current_scene_num) {
-        screen_overlay.set_callback([this, scene_num]() {
-            current_scene_num = scene_num;
-
-            compleks::logger::info(
-                "Loading scene " + std::to_string(current_scene_num));
-
-            get_world().current_scene = nullptr;
-            get_world().current_scene = create_scene(current_scene_num);
-        });
+        screen_overlay.set_callback(
+            [this, scene_num]() { load_scene(scene_num); });
         screen_overlay.animate(overlay::FADE_IN_OUT);
     }
 
     if (key == GLFW_KEY_R) {
-        screen_overlay.set_callback([this]() {
-            compleks::logger::info(
-                "Reloading scene " + std::to_string(current_scene_num));
-
-            get_world().current_scene = nullptr;
-            get_world().current_scene = create_scene(current_scene_num);
-        });
+        screen_overlay.set_callback(
+            [this]() { load_scene(current_scene_num); });
         screen_overlay.animate(overlay::FADE_IN_OUT);
     }
 }
@@ -77,26 +83,28 @@ void demo::render(double delta)
     engine::render(delta);
 
     // Check goal
-    if (!screen_overlay.is_running()) {
-        auto &j = get_world().current_scene->config;
-        if (j.contains("goal")) {
-            glm::vec3 pos = compleks::scene_loader::get_pos(j["goal"]["pos"]);
-            float r = j["goal"]["radius"];
+    if (goal) {
+        if (!screen_overlay.is_running()) {
+            glm::vec3 pos = goal->pos;
+            float r = 3;
 
             if (glm::length(get_world().camera.get_position() - pos) < r) {
                 screen_overlay.set_callback([this]() {
                     if (++current_scene_num > NUM_SCENES) {
                         current_scene_num = 1;
                     }
-
-                    compleks::logger::info(
-                        "Loading scene " + std::to_string(current_scene_num));
-
-                    get_world().current_scene = nullptr;
-                    get_world().current_scene = create_scene(current_scene_num);
+                    load_scene(current_scene_num);
                 });
                 screen_overlay.animate(overlay::FADE_IN_OUT);
             }
         }
+
+        static float t = 0;
+        t += (float)delta / 2;
+        if (t > glm::two_pi<float>()) {
+            t -= glm::two_pi<float>();
+        }
+
+        goal->quat = glm::quat({ 2 * t, 3 * t, t });
     }
 }
