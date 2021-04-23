@@ -13,21 +13,17 @@
             }
         }
     },
-    "goal": {
-        "pos": {
-            "x": 0,
-            "y": 0,
-            "z": -20
-        },
-        "radius": 3
+    "fog": {
+        "start": 20,
+        "end": 40
     },
     "bodies": {
         "plane": {
             "mesh": "quad",
             "shape": "plane",
             "scale": {
-                "x": 50,
-                "y": 50
+                "x": 500,
+                "y": 500
             },
             "quat": {
                 "pitch": -90.0

@@ -93,6 +93,13 @@ void program::set(std::string var, float value)
     glUniform1f(get_location(var), value);
 }
 
+void program::set(std::string var, glm::vec2 value)
+{
+    if (!linked)
+        return;
+    glUniform2fv(get_location(var), 1, glm::value_ptr(value));
+}
+
 void program::set(std::string var, glm::vec3 value)
 {
     if (!linked)

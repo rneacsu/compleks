@@ -28,6 +28,7 @@ public:
 
     void render(double, int w, int h, bool vr = false);
     std::shared_ptr<portal> get_closest_portal(glm::vec3 pos);
+    void set_fog(float start, float end);
 
 private:
     void set_transform(glm::mat4 view, glm::mat4 proj);
@@ -40,6 +41,7 @@ private:
     void update(double delta);
 
     int max_portal_depth = 5;
+    glm::vec2 fog;
 };
 
 }

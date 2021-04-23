@@ -23,6 +23,7 @@ public:
     void set(std::string var, int value);
     void set(std::string var, unsigned int value);
     void set(std::string var, float value);
+    void set(std::string var, glm::vec2 value);
     void set(std::string var, glm::vec3 value);
     void set(std::string var, glm::vec4 value);
     void set(std::string var, glm::mat4 value);

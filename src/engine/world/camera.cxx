@@ -226,11 +226,10 @@ void camera::mouse_scroll(float delta)
 
 void camera::reset()
 {
-    pos = { 1.5, EYE_HEIGHT, 1.5 };
+    pos = { 0, EYE_HEIGHT, 2.0f };
     up = { 0, 1, 0 };
-    yaw = glm::radians(-135.0f);
-    pitch = glm::radians(-30.0f);
-    roll = 0;
+    yaw = glm::radians(-90.0f);
+    pitch = roll = 0;
     fov = glm::radians(60.0f);
 
     set_position(pos, pos);

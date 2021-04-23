@@ -69,7 +69,7 @@ glm::vec4 scene_loader::get_color(nlohmann::ordered_json &j)
     return c;
 }
 
-glm::quat scene_loader::get_quat(nlohmann::ordered_json &j)
+glm::vec3 scene_loader::get_euler(nlohmann::ordered_json &j)
 {
     glm::vec3 euler(0);
 
@@ -83,7 +83,12 @@ glm::quat scene_loader::get_quat(nlohmann::ordered_json &j)
         euler.z = glm::radians<float>(j["roll"]);
     }
 
-    return glm::quat(euler);
+    return euler;
+}
+
+glm::quat scene_loader::get_quat(nlohmann::ordered_json &j)
+{
+    return glm::quat(get_euler(j));
 }
 
 void scene_loader::load_lights(nlohmann::ordered_json &j)
@@ -219,6 +224,31 @@ void scene_loader::load_portals(nlohmann::ordered_json &j)
     }
 }
 
+void scene_loader::load_camera(nlohmann::ordered_json &j)
+{
+    if (j.contains("pos")) {
+        glm::vec3 pos = get_pos(j["pos"]);
+        s.world.camera.set_position(pos, pos);
+    }
+    if (j.contains("quat")) {
+        s.world.camera.set_orientation(get_euler(j["quat"]));
+    }
+}
+
+void scene_loader::load_fog(nlohmann::ordered_json &j)
+{
+    float start = 0, end = 0;
+
+    if (j.contains("start")) {
+        start = j["start"];
+    }
+    if (j.contains("end")) {
+        end = j["end"];
+    }
+
+    s.world.set_fog(start, end);
+}
+
 void scene_loader::load(nlohmann::ordered_json &j)
 {
     if (!j.is_object()) {
@@ -230,11 +260,11 @@ void scene_loader::load(nlohmann::ordered_json &j)
 
         glClearColor(sky.r, sky.g, sky.b, sky.a);
     }
-
     if (j.contains("camera")) {
-        glm::vec3 pos = get_pos(j["camera"]);
-
-        s.world.camera.set_position(pos, pos);
+        load_camera(j["camera"]);
+    }
+    if (j.contains("fog")) {
+        load_fog(j["fog"]);
     }
 
     if (j.contains("bodies") && j["bodies"].is_object()) {

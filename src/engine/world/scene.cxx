@@ -16,6 +16,7 @@ scene::~scene()
     world.dynamic_objects.clear();
     world.portals.clear();
     world.camera.reset();
+    world.set_fog(0, 0);
     engine::get_lighting().clear();
     engine::get().remove_listener(this);
 }

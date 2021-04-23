@@ -44,6 +44,8 @@ in vec2 f_tex_coord;
 uniform bool clip;
 uniform vec4 clip_plane;
 
+uniform vec2 fog;
+
 out vec4 output_color;
 
 vec3 add_lights(vec3 color)
@@ -158,7 +160,14 @@ void main()
         discard;
     }
 
+    float fog_factor = 0;
+
+    if (fog.y > 0) {
+        fog_factor = (distance(eye, f_vertex) - fog.x) / (fog.y - fog.x);
+        fog_factor = clamp(fog_factor, 0.0, 1.0);
+    }
+
     color = add_lights(color);
 
-    output_color = vec4(color, material.alpha);
+    output_color = vec4(color, material.alpha * (1 - fog_factor));
 }

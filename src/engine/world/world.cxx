@@ -57,6 +57,8 @@ void world::render(double delta, int w, int h, bool vr)
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    engine::get_program().set("fog", fog);
+
     glm::mat4 view, proj;
     if (!vr) {
         glViewport(0, 0, w, h);
@@ -78,6 +80,7 @@ void world::render(double delta, int w, int h, bool vr)
     }
 
     engine::get_lighting().disable();
+    engine::get_program().set("fog", glm::vec2(0));
 
     proj = glm::ortho(0.0f, (float)w, 0.0f, (float)h, -1.0f, 1.0f);
     view = glm::scale(glm::mat4(1), glm::vec3(1.0f, 1.0f, 1.0f));
@@ -222,6 +225,12 @@ void world::render_portals(
 void world::set_transform(glm::mat4 view, glm::mat4 proj)
 {
     engine::get_program().set("projection_view_matrix", proj * view);
+}
+
+void world::set_fog(float start, float end)
+{
+    fog.x = start;
+    fog.y = end;
 }
 
 std::shared_ptr<portal> world::get_closest_portal(glm::vec3 pos)
