@@ -4,4 +4,5 @@ add_library(compleks_world OBJECT
     portal.cxx
     scene.cxx
     scene_loader.cxx
+    simple_scene.cxx
 )

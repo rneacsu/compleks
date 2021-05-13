@@ -15,6 +15,8 @@ public:
     void load_scene(int scene_num);
 
 private:
+    const int NUM_SCENES = 5;
+
     int current_scene_num;
     overlay screen_overlay;
     std::shared_ptr<compleks::body> goal;

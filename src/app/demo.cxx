@@ -1,7 +1,6 @@
 #include "demo.hxx"
 #include <iostream>
 
-#include "scenes/scenes.hxx"
 #include "shapes/shapes.hxx"
 
 demo::demo()
@@ -22,28 +21,13 @@ void demo::load_scene(int scene_num)
 {
     current_scene_num = scene_num;
     std::unique_ptr<compleks::scene> s;
+    std::string path = "res/scenes/scene" + std::to_string(scene_num) + ".json";
 
-    compleks::logger::info("Loading scene " + std::to_string(scene_num));
+    compleks::logger::info("Loading scene " + path);
 
     get_world().current_scene = nullptr;
-    switch (scene_num) {
-    case 1:
-        s = std::make_unique<scene1>();
-        break;
-    case 2:
-        s = std::make_unique<scene2>();
-        break;
-    case 3:
-        s = std::make_unique<scene3>();
-        break;
-    case 4:
-        s = std::make_unique<scene4>();
-        break;
-    case 5:
-        s = std::make_unique<scene5>();
-        break;
-    }
 
+    s = std::make_unique<compleks::simple_scene>(path);
     if (!s) {
         return;
     }
