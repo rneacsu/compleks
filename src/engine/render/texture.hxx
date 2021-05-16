@@ -12,12 +12,14 @@ class texture {
 public:
     enum mode { NEAREST, LINEAR };
 
+    texture(GLenum type);
     texture(const image &img, mode m = mode::LINEAR);
     ~texture();
 
     void bind();
 
 private:
+    GLenum type;
     GLuint id;
 };
 

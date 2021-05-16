@@ -5,7 +5,7 @@
 overlay::overlay()
 {
     overlay_obj = std::make_unique<compleks::object>("quad");
-    overlay_obj->color = { 0.85f, 0.85f, 0.85f, 0 };
+    overlay_obj->color = { 0.90f, 0.90f, 0.90f, 0 };
     overlay_obj->scale = { 10000, 10000, 1 };
     compleks::engine::get().get_world().hud.push_back(overlay_obj);
     running = false;

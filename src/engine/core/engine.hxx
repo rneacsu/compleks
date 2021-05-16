@@ -10,6 +10,7 @@
 #include "../render/lighting.hxx"
 #include "../render/mesh.hxx"
 #include "../render/program.hxx"
+#include "../render/skybox.hxx"
 #include "../utils/library.hxx"
 #include "../world/world.hxx"
 #include "context.hxx"
@@ -35,6 +36,7 @@ public:
     static lighting &get_lighting(void);
     static physics &get_physics(void);
     static world &get_world(void);
+    static skybox &get_skybox(void);
 
 private:
     library<mesh> meshes;
@@ -43,6 +45,7 @@ private:
     lighting light;
     physics phys;
     std::unique_ptr<world> wrld;
+    skybox sky;
 
     GLenum polygon_mode = GL_FILL;
     bool vr = false;

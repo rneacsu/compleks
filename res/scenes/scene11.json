@@ -19,7 +19,7 @@
     },
     "bodies": {
         "plane": {
-            "mesh": "ground",
+            "mesh": "quad",
             "shape": "plane",
             "scale": {
                 "x": 100,
@@ -27,41 +27,29 @@
             },
             "quat": {
                 "pitch": -90.0
+            },
+            "color": {
+                "r": 151,
+                "g": 255,
+                "b": 99
             }
         },
-        "wall1": {
+        "box": {
             "mesh": "cube",
             "shape": "cube",
+            "mass": 10,
             "pos": {
-                "y": 1.5,
-                "x": -2
+                "y": 0.5
             },
-            "scale": {
-                "x": 0.25,
-                "y": 3,
-                "z": 500
-            }
-        },
-        "wall2": {
-            "mesh": "cube",
-            "shape": "cube",
-            "pos": {
-                "y": 1.5,
-                "x": 2
-            },
-            "scale": {
-                "x": 0.25,
-                "y": 3,
-                "z": 500
-            }
+            "scale": 0.8
         },
         "gate1": {
             "mesh": "gate",
             "shape": "gate",
             "pos": {
-                "x": 0,
+                "x": -2,
                 "y": 0,
-                "z": -3
+                "z": -2
             },
             "color": {
                 "r": 255,
@@ -73,9 +61,9 @@
             "mesh": "gate",
             "shape": "gate",
             "pos": {
-                "x": 0,
+                "x": 2,
                 "y": 0,
-                "z": 3
+                "z": -2
             },
             "color": {
                 "r": 50,
@@ -83,22 +71,12 @@
                 "b": 255
             }
         },
-        "box": {
-            "mesh": "box",
-            "shape": "cube",
-            "mass": 10,
-            "pos": {
-                "y": 0.5,
-                "z": -2
-            },
-            "scale": 0.8
-        },
         "goal": {
             "mesh": "goal",
             "pos": {
                 "x": 0,
                 "y": 1,
-                "z": -7
+                "z": -5
             },
             "scale": 0.5,
             "color": {
@@ -112,9 +90,9 @@
         "p1": {
             "target": "p2",
             "pos": {
-                "x": 0,
+                "x": -2,
                 "y": 1,
-                "z": -3
+                "z": -2
             },
             "scale": {
                 "y": 2
@@ -126,12 +104,9 @@
         "p2": {
             "target": "p1",
             "pos": {
-                "x": 0,
+                "x": 2,
                 "y": 1,
-                "z": 3
-            },
-            "quat": {
-                "yaw": 180
+                "z": -2
             },
             "scale": {
                 "y": 2

@@ -8,6 +8,9 @@ namespace compleks {
 engine thread_local *engine::instance;
 
 engine::engine()
+    : prog(
+        std::make_unique<resource>("res/shaders/main.vs.glsl"),
+        std::make_unique<resource>("res/shaders/main.fs.glsl"))
 {
     if (instance) {
         throw std::runtime_error("Only one window can be created per thread");
@@ -31,6 +34,8 @@ engine::engine()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     generate_primitives();
+
+    prog.use();
 }
 
 engine::~engine()
@@ -75,6 +80,11 @@ world &engine::get_world()
     return *instance->wrld;
 }
 
+skybox &engine::get_skybox()
+{
+    return instance->sky;
+}
+
 void engine::key_down(int key, int mods)
 {
     switch (key) {
@@ -95,6 +105,7 @@ void engine::key_down(int key, int mods)
         break;
     case GLFW_KEY_F10:
         logger::info("Recompiling shaders...");
+        sky.skybox_program.reload();
         prog.reload();
         break;
     case GLFW_KEY_F12:
@@ -161,6 +172,31 @@ void engine::generate_primitives(void)
     t = { { 0, 1 }, { 1, 1 }, { 0, 0 }, { 1, 0 } };
     i = { 0, 2, 1, 2, 3, 1 };
     meshes.add("quad", v, n, t, i);
+
+    v = { { 0.5, 0.5, 0.5 },    { 0.5, 0.5, -0.5 },  { 0.5, -0.5, 0.5 },
+          { 0.5, -0.5, -0.5 },  { -0.5, 0.5, -0.5 }, { -0.5, 0.5, 0.5 },
+          { -0.5, -0.5, -0.5 }, { -0.5, -0.5, 0.5 }, { -0.5, 0.5, -0.5 },
+          { 0.5, 0.5, -0.5 },   { -0.5, 0.5, 0.5 },  { 0.5, 0.5, 0.5 },
+          { -0.5, -0.5, 0.5 },  { 0.5, -0.5, 0.5 },  { -0.5, -0.5, -0.5 },
+          { 0.5, -0.5, -0.5 },  { -0.5, 0.5, 0.5 },  { 0.5, 0.5, 0.5 },
+          { -0.5, -0.5, 0.5 },  { 0.5, -0.5, 0.5 },  { 0.5, 0.5, -0.5 },
+          { -0.5, 0.5, -0.5 },  { 0.5, -0.5, -0.5 }, { -0.5, -0.5, -0.5 } };
+    n = { { 1, 0, 0 },  { 1, 0, 0 },  { 1, 0, 0 },  { 1, 0, 0 },  { -1, 0, 0 },
+          { -1, 0, 0 }, { -1, 0, 0 }, { -1, 0, 0 }, { 0, 1, 0 },  { 0, 1, 0 },
+          { 0, 1, 0 },  { 0, 1, 0 },  { 0, -1, 0 }, { 0, -1, 0 }, { 0, -1, 0 },
+          { 0, -1, 0 }, { 0, 0, 1 },  { 0, 0, 1 },  { 0, 0, 1 },  { 0, 0, 1 },
+          { 0, 0, -1 }, { 0, 0, -1 }, { 0, 0, -1 }, { 0, 0, -1 } };
+    t = { { 0, 1 }, { 1, 1 }, { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 },
+          { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 }, { 0, 0 }, { 1, 0 },
+          { 0, 1 }, { 1, 1 }, { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 },
+          { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 }, { 0, 0 }, { 1, 0 } };
+
+    i
+        = { 0,  2,  1,  2,  3,  1,  4,  6,  5,  6,  7,  5,
+            8,  10, 9,  10, 11, 9,  12, 14, 13, 14, 15, 13,
+            16, 18, 17, 18, 19, 17, 20, 22, 21, 22, 23, 21 };
+
+    meshes.add("cube", v, n, t, i);
 }
 
 }

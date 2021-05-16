@@ -65,6 +65,9 @@ glm::vec4 scene_loader::get_color(nlohmann::ordered_json &j)
     if (j.contains("b")) {
         c.b = j["b"] / 255.0f;
     }
+    if (j.contains("a")) {
+        c.a = j["a"];
+    }
 
     return c;
 }
@@ -228,6 +231,7 @@ void scene_loader::load_camera(nlohmann::ordered_json &j)
 {
     if (j.contains("pos")) {
         glm::vec3 pos = get_pos(j["pos"]);
+        pos.y += s.world.camera.EYE_HEIGHT;
         s.world.camera.set_position(pos, pos);
     }
     if (j.contains("quat")) {

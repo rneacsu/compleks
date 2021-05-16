@@ -37,6 +37,7 @@ public:
     ~mesh();
 
     void render(glm::vec4 color = glm::vec4(1));
+    void render_simple(void);
 
 private:
     GLuint vao, vertices_buf, normals_buf, tex_coords_buf, indices_buf;
@@ -50,6 +51,8 @@ private:
 
     void create_buffers(void);
     void create_default_material(void);
+    void update_material(material &m);
+    void draw_shape(shape &s);
 };
 
 } // namespace compleks

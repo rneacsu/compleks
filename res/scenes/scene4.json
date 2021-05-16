@@ -19,160 +19,73 @@
     },
     "bodies": {
         "plane": {
-            "mesh": "quad",
+            "mesh": "ground",
             "shape": "plane",
             "scale": {
-                "x": 500,
-                "y": 500
+                "x": 100,
+                "y": 100
             },
             "quat": {
                 "pitch": -90.0
-            },
-            "color": {
-                "r": 151,
-                "g": 255,
-                "b": 99
             }
         },
-        "cube1": {
-            "mesh": "cube",
-            "shape": "cube",
-            "mass": 10,
-            "pos": {
-                "y": 0.5,
-                "z": -2
-            },
-            "scale": 0.8,
-            "color": {
-                "r": 255,
-                "g": 125,
-                "b": 125
-            }
-        },
-        "gate11": {
+        "gate1": {
             "mesh": "gate",
             "shape": "gate",
-            "scale": {
-                "x": 4,
-                "y": 1.5,
-                "z": 32
-            },
-            "color": {
-                "r": 107,
-                "g": 184,
-                "b": 255
-            }
-        },
-        "gate12": {
-            "mesh": "gate",
-            "shape": "gate",
-            "quat": {
-                "yaw": 90
-            },
-            "scale": {
-                "x": 8,
-                "y": 1.5,
-                "z": 16
-            },
-            "color": {
-                "r": 107,
-                "g": 184,
-                "b": 255
-            }
-        },
-        "pillar1": {
-            "mesh": "cube",
-            "shape": "cube",
             "pos": {
                 "x": 0,
-                "y": 1.5,
-                "z": 1.875
-            },
-            "scale": {
-                "x": 0.25,
-                "y": 3,
-                "z": 0.25
-            }
-        },
-        "cube2": {
-            "mesh": "cube",
-            "shape": "cube",
-            "mass": 10,
-            "pos": {
-                "x": 10,
-                "y": 0.5,
+                "y": 0,
                 "z": -2
             },
-            "scale": 0.8,
             "color": {
-                "r": 125,
-                "g": 125,
-                "b": 255
+                "r": 255,
+                "g": 50,
+                "b": 50
             }
         },
-        "gate21": {
+        "gate2": {
             "mesh": "gate",
             "shape": "gate",
             "pos": {
-                "x": 10
-            },
-            "scale": {
-                "x": 4,
-                "y": 1.5,
-                "z": 32
+                "x": -4,
+                "y": 0,
+                "z": -2
             },
             "color": {
-                "r": 107,
-                "g": 184,
+                "r": 50,
+                "g": 50,
                 "b": 255
-            }
-        },
-        "gate22": {
-            "mesh": "gate",
-            "shape": "gate",
-            "pos": {
-                "x": 10
-            },
-            "quat": {
-                "yaw": 90
-            },
-            "scale": {
-                "x": 8,
-                "y": 1.5,
-                "z": 16
-            },
-            "color": {
-                "r": 107,
-                "g": 184,
-                "b": 255
-            }
-        },
-        "pillar2": {
-            "mesh": "cube",
-            "shape": "cube",
-            "pos": {
-                "x": 10,
-                "y": 1.5,
-                "z": 1.875
-            },
-            "scale": {
-                "x": 0.25,
-                "y": 3,
-                "z": 0.25
             }
         },
         "goal": {
             "mesh": "goal",
             "pos": {
-                "x": 0,
+                "x": -4,
                 "y": 1,
-                "z": -10
+                "z": 3
             },
             "scale": 0.5,
             "color": {
                 "r": 77,
                 "g": 232,
                 "b": 232
+            }
+        },
+        "wall": {
+            "mesh": "cube",
+            "shape": "cube",
+            "pos": {
+                "x": -2,
+                "y": 1.5,
+                "z": 0
+            },
+            "scale": {
+                "x": 0.5,
+                "y": 3,
+                "z": 100
+            },
+            "color": {
+                "a": 0.3
             }
         }
     },
@@ -181,61 +94,32 @@
             "target": "p2",
             "pos": {
                 "x": 0,
-                "y": 1.5,
-                "z": 3
+                "y": 1,
+                "z": -2
             },
             "scale": {
-                "x": 2,
-                "y": 3
+                "y": 2
             },
-            "quat": {
-                "yaw": -90
-            }
+            "subPortals": [
+                "p2"
+            ]
         },
         "p2": {
             "target": "p1",
             "pos": {
-                "x": 10,
-                "y": 1.5,
-                "z": 3
-            },
-            "scale": {
-                "x": 2,
-                "y": 3
+                "x": -4,
+                "y": 1,
+                "z": -2
             },
             "quat": {
-                "yaw": 90
-            }
-        },
-        "p3": {
-            "target": "p4",
-            "pos": {
-                "x": 0,
-                "y": 1.5,
-                "z": 3
+                "yaw": 0
             },
             "scale": {
-                "x": 2,
-                "y": 3
+                "y": 2
             },
-            "quat": {
-                "yaw": 90
-            }
-        },
-        "p4": {
-            "target": "p3",
-            "pos": {
-                "x": 10,
-                "y": 1.5,
-                "z": 3
-            },
-            "scale": {
-                "x": 2,
-                "y": 3
-            },
-            "quat": {
-                "yaw": -90
-            }
+            "subPortals": [
+                "p1"
+            ]
         }
     }
 }

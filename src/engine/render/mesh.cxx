@@ -170,8 +170,8 @@ void mesh::create_buffers()
 
 void mesh::create_default_material(void)
 {
-    default_material.diffuse_color = glm::vec3(0.8f, 0.8f, 0.8f);
-    default_material.specular_color = glm::vec3(0.05f, 0.05f, 0.05f);
+    default_material.diffuse_color = glm::vec3(0.95f, 0.95f, 0.95f);
+    default_material.specular_color = glm::vec3(0.25f, 0.25f, 0.25f);
     default_material.ambient_color = glm::vec3(1.0f, 1.0f, 1.0f);
     default_material.emissive_color = glm::vec3(0.0f, 0.0f, 0.0f);
     default_material.shininess = 324;
@@ -187,62 +187,81 @@ mesh::~mesh()
     glDeleteVertexArrays(1, &vao);
 }
 
+void mesh::update_material(material &m)
+{
+    program &p = engine::get_program();
+
+    if (m.diffuse_tex) {
+        p.set("material.diffuse.tex_on", true);
+        p.set("material.diffuse.tex", *m.diffuse_tex);
+    } else {
+        p.set("material.diffuse.tex_on", false);
+        p.set("material.diffuse.color", m.diffuse_color);
+    }
+
+    if (m.specular_tex) {
+        p.set("material.specular.tex_on", true);
+        p.set("material.specular.tex", *m.specular_tex);
+    } else {
+        p.set("material.specular.tex_on", false);
+        p.set("material.specular.color", m.specular_color);
+    }
+
+    if (m.ambient_tex) {
+        p.set("material.ambient.tex_on", true);
+        p.set("material.ambient.tex", *m.ambient_tex);
+    } else {
+        p.set("material.ambient.tex_on", false);
+        p.set("material.ambient.color", m.ambient_color);
+    }
+
+    if (m.emissive_tex) {
+        p.set("material.emissive.tex_on", true);
+        p.set("material.emissive.tex", *m.emissive_tex);
+    } else {
+        p.set("material.emissive.tex_on", false);
+        p.set("material.emissive.color", m.emissive_color);
+    }
+
+    p.set("material.shininess", m.shininess);
+}
+
 void mesh::render(glm::vec4 color)
 {
     program &p = engine::get_program();
 
+    p.set("material.tint", glm::vec3(color));
+    p.set("material.alpha", color.a);
+
     glBindVertexArray(vao);
     for (auto &s : shapes) {
-        material *m;
         if (s.material_idx < 0) {
-            m = &default_material;
+            update_material(default_material);
         } else {
-            m = &materials[s.material_idx];
+            update_material(materials[s.material_idx]);
         }
 
-        if (m->diffuse_tex) {
-            p.set("material.diffuse.tex_on", true);
-            p.set("material.diffuse.tex", *m->diffuse_tex);
-        } else {
-            p.set("material.diffuse.tex_on", false);
-            p.set("material.diffuse.color", m->diffuse_color);
-        }
-
-        if (m->specular_tex) {
-            p.set("material.specular.tex_on", true);
-            p.set("material.specular.tex", *m->specular_tex);
-        } else {
-            p.set("material.specular.tex_on", false);
-            p.set("material.specular.color", m->specular_color);
-        }
-
-        if (m->ambient_tex) {
-            p.set("material.ambient.tex_on", true);
-            p.set("material.ambient.tex", *m->ambient_tex);
-        } else {
-            p.set("material.ambient.tex_on", false);
-            p.set("material.ambient.color", m->ambient_color);
-        }
-
-        if (m->emissive_tex) {
-            p.set("material.emissive.tex_on", true);
-            p.set("material.emissive.tex", *m->emissive_tex);
-        } else {
-            p.set("material.emissive.tex_on", false);
-            p.set("material.emissive.color", m->emissive_color);
-        }
-
-        p.set("material.shininess", m->shininess);
-        p.set("material.tint", glm::vec3(color));
-        p.set("material.alpha", color.a);
-
-        glDrawElements(
-            GL_TRIANGLES,
-            s.num_indices,
-            GL_UNSIGNED_INT,
-            (void *)((size_t)s.start_index * sizeof(indices[0])));
+        draw_shape(s);
     }
     glBindVertexArray(0);
+}
+
+void mesh::render_simple(void)
+{
+    glBindVertexArray(vao);
+    for (auto &s : shapes) {
+        draw_shape(s);
+    }
+    glBindVertexArray(0);
+}
+
+void mesh::draw_shape(shape &s)
+{
+    glDrawElements(
+        GL_TRIANGLES,
+        s.num_indices,
+        GL_UNSIGNED_INT,
+        (void *)((size_t)s.start_index * sizeof(indices[0])));
 }
 
 }

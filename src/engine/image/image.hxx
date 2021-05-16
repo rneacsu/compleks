@@ -12,6 +12,7 @@ public:
 
     image(void);
     image(const resource &res);
+    image(image &&img);
     ~image();
 };
 

@@ -1,0 +1,265 @@
+{
+    "sky": {
+        "r": 135,
+        "g": 206,
+        "b": 235
+    },
+    "lights": {
+        "sun": {
+            "pos": {
+                "x": 800,
+                "y": 1000,
+                "z": 800
+            }
+        }
+    },
+    "fog": {
+        "start": 20,
+        "end": 40
+    },
+    "bodies": {
+        "plane": {
+            "mesh": "ground",
+            "shape": "plane",
+            "scale": {
+                "x": 100,
+                "y": 100
+            },
+            "quat": {
+                "pitch": -90.0
+            }
+        },
+        "wall1": {
+            "mesh": "cube",
+            "shape": "cube",
+            "pos": {
+                "x": 2,
+                "y": 1.5,
+                "z": -2.5
+            },
+            "scale": {
+                "x": 0.25,
+                "y": 3,
+                "z": 13
+            }
+        },
+        "wall2": {
+            "mesh": "cube",
+            "shape": "cube",
+            "pos": {
+                "x": -2,
+                "y": 1.5,
+                "z": -4
+            },
+            "scale": {
+                "x": 0.25,
+                "y": 3,
+                "z": 16
+            }
+        },
+        "wall3": {
+            "mesh": "cube",
+            "shape": "cube",
+            "pos": {
+                "x": 6,
+                "y": 1.5,
+                "z": -4
+            },
+            "scale": {
+                "x": 0.25,
+                "y": 3,
+                "z": 16
+            }
+        },
+        "wall4": {
+            "mesh": "cube",
+            "shape": "cube",
+            "pos": {
+                "x": 2,
+                "y": 1.5,
+                "z": -12
+            },
+            "scale": {
+                "x": 8,
+                "y": 3,
+                "z": 0.25
+            }
+        },
+        "wall5": {
+            "mesh": "cube",
+            "shape": "cube",
+            "pos": {
+                "x": 2,
+                "y": 1.5,
+                "z": 4
+            },
+            "scale": {
+                "x": 8,
+                "y": 3,
+                "z": 0.25
+            }
+        },
+        "gate1": {
+            "mesh": "gate",
+            "shape": "gate",
+            "pos": {
+                "x": 0,
+                "y": 0,
+                "z": -5
+            },
+            "scale": {
+                "z": 24
+            },
+            "color": {
+                "r": 255,
+                "g": 50,
+                "b": 50
+            }
+        },
+        "gate2": {
+            "mesh": "gate",
+            "shape": "gate",
+            "pos": {
+                "x": 4,
+                "y": 0,
+                "z": -7
+            },
+            "scale": {
+                "z": 8
+            },
+            "color": {
+                "r": 50,
+                "g": 50,
+                "b": 255
+            }
+        },
+        "goal": {
+            "mesh": "goal",
+            "pos": {
+                "x": 4,
+                "y": 1,
+                "z": 0
+            },
+            "scale": 0.5,
+            "color": {
+                "r": 77,
+                "g": 232,
+                "b": 232
+            }
+        }
+    },
+    "portals": {
+        "p1": {
+            "target": "p2",
+            "pos": {
+                "x": 0,
+                "y": 1,
+                "z": -2
+            },
+            "scale": {
+                "y": 2
+            }
+        },
+        "p3": {
+            "target": "p4",
+            "pos": {
+                "x": 4,
+                "y": 1,
+                "z": -6
+            },
+            "scale": {
+                "y": 2
+            }
+        },
+        "p6": {
+            "target": "p5",
+            "pos": {
+                "x": 4,
+                "y": 1,
+                "z": -8
+            },
+            "scale": {
+                "y": 2
+            },
+            "quat": {
+                "yaw": 180
+            }
+        },
+        "p8": {
+            "target": "p7",
+            "pos": {
+                "x": 0,
+                "y": 1,
+                "z": -8
+            },
+            "scale": {
+                "y": 2
+            },
+            "quat": {
+                "yaw": 180
+            }
+        },
+        "p2": {
+            "target": "p1",
+            "pos": {
+                "x": 4,
+                "y": 1,
+                "z": -6.01
+            },
+            "scale": {
+                "y": 2
+            },
+            "quat": {
+                "yaw": 180
+            },
+            "subPortals": [
+                "p7"
+            ]
+        },
+        "p4": {
+            "target": "p3",
+            "pos": {
+                "x": 0,
+                "y": 1,
+                "z": -2.01
+            },
+            "scale": {
+                "y": 2
+            },
+            "quat": {
+                "yaw": 180
+            },
+            "subPortals": [
+                "p5"
+            ]
+        },
+        "p7": {
+            "target": "p8",
+            "pos": {
+                "x": 4,
+                "y": 1,
+                "z": -7.99
+            },
+            "scale": {
+                "y": 2
+            },
+            "subPortals": [
+                "p2"
+            ]
+        },
+        "p5": {
+            "target": "p6",
+            "pos": {
+                "x": 0,
+                "y": 1,
+                "z": -7.99
+            },
+            "scale": {
+                "y": 2
+            },
+            "subPortals": [
+                "p4"
+            ]
+        }
+    }
+}

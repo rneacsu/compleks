@@ -8,6 +8,8 @@
 
 namespace compleks {
 
+std::mutex logger::lock;
+
 void logger::log(level type, std::string msg)
 {
     auto now = std::chrono::system_clock().now();
@@ -36,8 +38,11 @@ void logger::log(level type, std::string msg)
         color_code = 37;
     }
 
-    std::cerr << "\x1B[" << color_code << "m[" << ss.str() << "] " << msg
-              << "\x1B[0m\n";
+    {
+        std::lock_guard<std::mutex> g(lock);
+        std::cerr << "\x1B[" << color_code << "m[" << ss.str() << "] " << msg
+                  << "\x1B[0m\n";
+    }
 }
 
 void logger::info(std::string msg)

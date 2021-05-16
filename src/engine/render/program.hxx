@@ -15,10 +15,11 @@ namespace compleks {
 
 class program {
 public:
-    program();
+    program(std::unique_ptr<resource> vs, std::unique_ptr<resource> fs);
     ~program();
 
     bool reload(void);
+    void use(void);
 
     void set(std::string var, int value);
     void set(std::string var, unsigned int value);

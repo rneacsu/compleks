@@ -96,6 +96,8 @@ void world::render(double delta, int w, int h, bool vr)
 void world::render_objects(glm::mat4 view, glm::mat4 proj)
 {
     glm::vec3 eye_pos = glm::inverse(view) * glm::vec4(0, 0, 0, 1);
+
+    engine::get_skybox().render(view, proj);
     engine::get_lighting().update(eye_pos);
 
     set_transform(view, proj);

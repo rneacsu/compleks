@@ -10,7 +10,7 @@ using namespace std::literals;
 
 namespace compleks {
 
-program::program()
+program::program(std::unique_ptr<resource> vs, std::unique_ptr<resource> fs)
     : vertex_shader(shader::VERTEX)
     , fragment_shader(shader::FRAGMENT)
 {
@@ -18,8 +18,8 @@ program::program()
     glAttachShader(id, vertex_shader.id);
     glAttachShader(id, fragment_shader.id);
 
-    vertex_shader.compile(std::make_unique<resource>("res/main.vs.glsl"));
-    fragment_shader.compile(std::make_unique<resource>("res/main.fs.glsl"));
+    vertex_shader.compile(std::move(vs));
+    fragment_shader.compile(std::move(fs));
 
     link();
 }
@@ -56,9 +56,14 @@ bool program::link()
     }
 
     linked = true;
-    glUseProgram(id);
+    use();
 
     return true;
+}
+
+void program::use(void)
+{
+    glUseProgram(id);
 }
 
 GLint program::get_location(std::string var)

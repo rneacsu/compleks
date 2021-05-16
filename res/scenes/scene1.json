@@ -1,8 +1,8 @@
 {
     "sky": {
-        "r": 135,
-        "g": 206,
-        "b": 235
+        "r": 171,
+        "g": 228,
+        "b": 255
     },
     "lights": {
         "sun": {
@@ -19,56 +19,14 @@
     },
     "bodies": {
         "plane": {
-            "mesh": "quad",
+            "mesh": "ground",
             "shape": "plane",
             "scale": {
-                "x": 500,
-                "y": 500
+                "x": 100,
+                "y": 100
             },
             "quat": {
                 "pitch": -90.0
-            },
-            "color": {
-                "r": 151,
-                "g": 255,
-                "b": 99
-            }
-        },
-        "box": {
-            "mesh": "cube",
-            "shape": "cube",
-            "mass": 10,
-            "pos": {
-                "y": 0.5
-            },
-            "scale": 0.8
-        },
-        "gate1": {
-            "mesh": "gate",
-            "shape": "gate",
-            "pos": {
-                "x": -2,
-                "y": 0,
-                "z": -2
-            },
-            "color": {
-                "r": 255,
-                "g": 50,
-                "b": 50
-            }
-        },
-        "gate2": {
-            "mesh": "gate",
-            "shape": "gate",
-            "pos": {
-                "x": 2,
-                "y": 0,
-                "z": -2
-            },
-            "color": {
-                "r": 50,
-                "g": 50,
-                "b": 255
             }
         },
         "goal": {
@@ -84,36 +42,6 @@
                 "g": 232,
                 "b": 232
             }
-        }
-    },
-    "portals": {
-        "p1": {
-            "target": "p2",
-            "pos": {
-                "x": -2,
-                "y": 1,
-                "z": -2
-            },
-            "scale": {
-                "y": 2
-            },
-            "subPortals": [
-                "p2"
-            ]
-        },
-        "p2": {
-            "target": "p1",
-            "pos": {
-                "x": 2,
-                "y": 1,
-                "z": -2
-            },
-            "scale": {
-                "y": 2
-            },
-            "subPortals": [
-                "p1"
-            ]
         }
     }
 }

@@ -1,6 +1,7 @@
 #ifndef __COMPLEKS_UTILS_LOGGER_HXX
 #define __COMPLEKS_UTILS_LOGGER_HXX
 
+#include <mutex>
 #include <string>
 
 namespace compleks {
@@ -16,6 +17,7 @@ private:
 
     logger() = delete;
     static void log(level type, std::string msg);
+    static std::mutex lock;
 };
 
 } // namespace compleks

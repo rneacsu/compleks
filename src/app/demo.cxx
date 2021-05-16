@@ -5,13 +5,16 @@
 
 demo::demo()
 {
-    get_meshes().add("cube", "res/meshes/box.obj");
+    get_meshes().add("ground", "res/meshes/ground.obj");
+    get_meshes().add("box", "res/meshes/box.obj");
     get_meshes().add("gate", "res/meshes/gate.obj");
     get_meshes().add("goal", "res/meshes/hyperisocahedron.obj");
 
     get_shapes().add("plane", []() { return std::make_unique<plane_shape>(); });
     get_shapes().add("cube", []() { return std::make_unique<cube_shape>(); });
     get_shapes().add("gate", []() { return std::make_unique<gate_shape>(); });
+
+    get_skybox().load("res/skybox", "png");
 
     load_scene(1);
     screen_overlay.animate(overlay::FADE_OUT);
@@ -55,10 +58,14 @@ void demo::key_down(int key, int mods)
     }
 
     if (key == GLFW_KEY_R) {
-        screen_overlay.set_callback(
-            [this]() { load_scene(current_scene_num); });
-        screen_overlay.animate(overlay::FADE_IN_OUT);
+        restart_scene();
     }
+}
+
+void demo::restart_scene(void)
+{
+    screen_overlay.set_callback([this]() { load_scene(current_scene_num); });
+    screen_overlay.animate(overlay::FADE_IN_OUT);
 }
 
 void demo::render(double delta)
@@ -70,7 +77,7 @@ void demo::render(double delta)
     if (goal) {
         if (!screen_overlay.is_running()) {
             glm::vec3 pos = goal->pos;
-            float r = 3;
+            float r = 2;
 
             if (glm::length(get_world().camera.get_position() - pos) < r) {
                 screen_overlay.set_callback([this]() {
@@ -90,5 +97,10 @@ void demo::render(double delta)
         }
 
         goal->quat = glm::quat({ 2 * t, 3 * t, t });
+    }
+
+    // Check if too far from level area
+    if (glm::length(get_world().camera.get_position()) > 25) {
+        restart_scene();
     }
 }
