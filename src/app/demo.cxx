@@ -10,8 +10,6 @@ demo::demo()
     get_meshes().add("gate", "res/meshes/gate.obj");
     get_meshes().add("goal", "res/meshes/hyperisocahedron.obj");
 
-    get_shapes().add("plane", []() { return std::make_unique<plane_shape>(); });
-    get_shapes().add("cube", []() { return std::make_unique<cube_shape>(); });
     get_shapes().add("gate", []() { return std::make_unique<gate_shape>(); });
 
     get_skybox().load("res/skybox", "png");

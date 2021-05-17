@@ -163,7 +163,6 @@ void engine::generate_primitives(void)
     std::vector<glm::vec2> t;
     std::vector<unsigned int> i;
 
-    // quad
     v = { { -0.5, 0.5, 0 },
           { 0.5, 0.5, 0 },
           { -0.5, -0.5, 0 },
@@ -197,6 +196,15 @@ void engine::generate_primitives(void)
             16, 18, 17, 18, 19, 17, 20, 22, 21, 22, 23, 21 };
 
     meshes.add("cube", v, n, t, i);
+
+    shapes.add("plane", []() {
+        return std::make_unique<shape>(
+            std::make_unique<btBoxShape>(btVector3(0.5f, 0.5f, 0.01f)));
+    });
+    shapes.add("cube", []() {
+        return std::make_unique<shape>(
+            std::make_unique<btBoxShape>(btVector3(0.5f, 0.5f, 0.5f)));
+    });
 }
 
 }

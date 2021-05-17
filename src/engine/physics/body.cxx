@@ -45,8 +45,8 @@ void body::create_body(std::unique_ptr<shape> s)
 
     collision_shape->get_shape().setLocalScaling(physics::to_bt(scale));
 
-    motion_state = std::make_unique<btDefaultMotionState>(
-        physics::to_bt(pos, quat));
+    motion_state
+        = std::make_unique<btDefaultMotionState>(physics::to_bt(pos, quat));
 
     btVector3 local_inertia = btVector3(0, 0, 0);
     if (inertia) {

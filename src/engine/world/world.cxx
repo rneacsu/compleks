@@ -102,10 +102,6 @@ void world::render_objects(glm::mat4 view, glm::mat4 proj)
 
     set_transform(view, proj);
 
-    for (auto &obj : static_objects) {
-        obj->render();
-    }
-
     for (auto &obj : dynamic_objects) {
         if (obj->clone_body) {
             engine::get_program().set("clip", true);
@@ -127,6 +123,10 @@ void world::render_objects(glm::mat4 view, glm::mat4 proj)
         } else {
             obj->render();
         }
+    }
+
+    for (auto &obj : static_objects) {
+        obj->render();
     }
 }
 

@@ -15,7 +15,7 @@ public:
     struct light {
         bool off = false;
         glm::vec3 pos = glm::vec3();
-        glm::vec3 ambient = glm::vec3(0.2f);
+        glm::vec3 ambient = glm::vec3(0.35f);
         glm::vec3 diffuse = glm::vec3(1);
         glm::vec3 specular = glm::vec3(1);
         glm::vec3 attenuation = glm::vec3(1, 0, 0);

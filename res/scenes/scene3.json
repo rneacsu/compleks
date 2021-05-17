@@ -29,24 +29,40 @@
                 "pitch": -90.0
             }
         },
-        "platform": {
-            "mesh": "cube",
-            "shape": "cube",
+        "gate1": {
+            "mesh": "gate",
+            "shape": "gate",
             "pos": {
-                "y": 0.5,
-                "z": -7
+                "x": 0,
+                "y": 0,
+                "z": -2
             },
-            "scale": {
-                "x": 10,
-                "z": 10
+            "color": {
+                "r": 255,
+                "g": 50,
+                "b": 50
+            }
+        },
+        "gate2": {
+            "mesh": "gate",
+            "shape": "gate",
+            "pos": {
+                "x": -4,
+                "y": 0,
+                "z": -2
+            },
+            "color": {
+                "r": 50,
+                "g": 50,
+                "b": 255
             }
         },
         "goal": {
             "mesh": "goal",
             "pos": {
-                "x": 0,
-                "y": 2,
-                "z": -7
+                "x": -4,
+                "y": 1,
+                "z": 3
             },
             "scale": 0.5,
             "color": {
@@ -54,6 +70,56 @@
                 "g": 232,
                 "b": 232
             }
+        },
+        "wall": {
+            "mesh": "cube",
+            "shape": "cube",
+            "pos": {
+                "x": -2,
+                "y": 1.5,
+                "z": 0
+            },
+            "scale": {
+                "x": 0.5,
+                "y": 3,
+                "z": 100
+            },
+            "color": {
+                "a": 0.3
+            }
+        }
+    },
+    "portals": {
+        "p1": {
+            "target": "p2",
+            "pos": {
+                "x": 0,
+                "y": 1,
+                "z": -2
+            },
+            "scale": {
+                "y": 2
+            },
+            "subPortals": [
+                "p2"
+            ]
+        },
+        "p2": {
+            "target": "p1",
+            "pos": {
+                "x": -4,
+                "y": 1,
+                "z": -2
+            },
+            "quat": {
+                "yaw": 0
+            },
+            "scale": {
+                "y": 2
+            },
+            "subPortals": [
+                "p1"
+            ]
         }
     }
 }
