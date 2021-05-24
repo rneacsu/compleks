@@ -29,6 +29,19 @@
                 "pitch": -90.0
             }
         },
+        "tree": {
+            "mesh": "tree",
+            "shape": "tree",
+            "pos": {
+                "x": -3,
+                "y": 0,
+                "z": -9
+            },
+            "scale": 0.4,
+            "quat": {
+                "yaw": 60
+            }
+        },
         "goal": {
             "mesh": "goal",
             "pos": {

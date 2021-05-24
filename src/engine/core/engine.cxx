@@ -205,6 +205,9 @@ void engine::generate_primitives(void)
         return std::make_unique<shape>(
             std::make_unique<btBoxShape>(btVector3(0.5f, 0.5f, 0.5f)));
     });
+    shapes.add("sphere", []() {
+        return std::make_unique<shape>(std::make_unique<btSphereShape>(0.5f));
+    });
 }
 
 }

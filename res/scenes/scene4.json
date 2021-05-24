@@ -93,6 +93,19 @@
             },
             "scale": 0.8
         },
+        "tree": {
+            "mesh": "tree",
+            "shape": "tree",
+            "pos": {
+                "x": 0,
+                "y": 0,
+                "z": -9
+            },
+            "scale": 0.4,
+            "quat": {
+                "yaw": 60
+            }
+        },
         "goal": {
             "mesh": "goal",
             "pos": {

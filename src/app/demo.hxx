@@ -10,6 +10,7 @@ public:
     demo();
 
     void key_down(int, int) override;
+    void mouse_down(int) override;
     void render(double delta) override;
 
     void load_scene(int scene_num);
