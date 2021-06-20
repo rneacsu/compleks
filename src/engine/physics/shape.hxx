@@ -10,6 +10,7 @@ class shape {
 public:
     shape();
     shape(std::unique_ptr<btCollisionShape> s);
+    virtual ~shape();
 
     btCollisionShape &get_shape(void);
     void set_shape(std::unique_ptr<btCollisionShape> s);

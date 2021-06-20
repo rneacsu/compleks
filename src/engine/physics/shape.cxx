@@ -6,6 +6,10 @@ shape::shape()
 {
 }
 
+shape::~shape()
+{
+}
+
 shape::shape(std::unique_ptr<btCollisionShape> s)
 {
     set_shape(std::move(s));

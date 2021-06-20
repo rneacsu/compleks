@@ -22,6 +22,18 @@ target_link_libraries(compleks
     GLEW::GLEW
     glfw
     tinyobjloader::tinyobjloader
-    LinearMath Bullet3Common BulletCollision BulletDynamics
+    BulletCollision BulletDynamics
     nlohmann_json::nlohmann_json
 )
+
+if (CMAKE_BUILD_TYPE MATCHES Release)
+    target_link_libraries(compleks
+        ${BULLET_LIBRARY_DIRS}/LinearMath.lib
+        ${BULLET_LIBRARY_DIRS}/Bullet3Common.lib
+    )
+else()
+    target_link_libraries(compleks
+        ${BULLET_LIBRARY_DIRS}/../debug/lib/LinearMath_Debug.lib
+        ${BULLET_LIBRARY_DIRS}/../debug/lib/Bullet3Common_Debug.lib
+    )
+endif()

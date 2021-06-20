@@ -16,7 +16,7 @@ find_package(nlohmann_json REQUIRED)
 
 set(CMAKE_CXX_FLAGS
     "/EHsc /W4 /WX \
-    /experimental:external /external:anglebrackets /external:W0 \
+    /external:anglebrackets /external:W0 \
     /std:c++17"
 )
 
